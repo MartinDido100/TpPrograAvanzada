@@ -1,4 +1,6 @@
 package utils;
+import cofre.TipoCofre;
+
 import java.util.List;
 
 public class DatosJson {
@@ -124,7 +126,7 @@ public class DatosJson {
         private int posicionX;
         private int posicionY;
         private int id;
-        private String tipo;
+        private TipoCofre tipo;
 
         public int getPosicionX() {
             return posicionX;
@@ -150,11 +152,11 @@ public class DatosJson {
             this.id = id;
         }
 
-        public String getTipo() {
+        public TipoCofre getTipo() {
             return tipo;
         }
 
-        public void setTipo(String tipo) {
+        public void setTipo(TipoCofre tipo) {
             this.tipo = tipo;
         }
     }

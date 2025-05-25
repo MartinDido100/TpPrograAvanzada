@@ -1,108 +1,29 @@
 {
   "mapa": {
     "robopuertos": [
-      {
-        "posicionX": 4,
-        "posicionY": 9,
-        "id": 1
-      },
-      {
-        "posicionX": 13,
-        "posicionY": 11,
-        "id": 2
-      },
-      {
-        "posicionX": 17,
-        "posicionY": 7,
-        "id": 3
-      },
-      {
-        "posicionX": 14,
-        "posicionY": 3,
-        "id": 4
-      }
+      { "posicionX": 5, "posicionY": 5, "id": 1 },
+      { "posicionX": 5, "posicionY": 6, "id": 2 },
+      { "posicionX": 15, "posicionY": 15, "id": 3 }
     ],
     "casilleros": 20
   },
-  "robots": [
-    {
-      "id": 1,
-      "posicionX": 9,
-      "posicionY": 9
-    },
-    {
-      "id": 2,
-      "posicionX": 10,
-      "posicionY": 10
-    },
-    {
-      "id": 3,
-      "posicionX": 11,
-      "posicionY": 11
-    }
-  ],
   "cofres": [
-    {
-      "posicionX": 12,
-      "posicionY": 10,
-      "id": 1,
-      "tipo": "SOLICITUD"
-    },
-    {
-      "posicionX": 5,
-      "posicionY": 5,
-      "id": 1,
-      "tipo": "ACTIVO"
-    },
-    {
-      "posicionX": 1,
-      "posicionY": 1,
-      "id": 1,
-      "tipo": "PASIVO"
-    },
-    {
-      "posicionX": 2,
-      "posicionY": 2,
-      "id": 1,
-      "tipo": "BUFER"
-    },
-    {
-      "posicionX": 3,
-      "posicionY": 3,
-      "id": 1,
-      "tipo": "ALMACENAMIENTO"
-    }
+    { "posicionX": 6, "posicionY": 5, "id": 1, "tipo": "SOLICITUD" },
+    { "posicionX": 10, "posicionY": 10, "id": 2, "tipo": "ACTIVO" },
+    { "posicionX": 16, "posicionY": 15, "id": 3, "tipo": "PASIVO" },
+    { "posicionX": 0, "posicionY": 0, "id": 4, "tipo": "BUFER" }
+  ],
+  "robots": [
+    { "id": 1, "posicionX": 0, "posicionY": 19 },
+    { "id": 2, "posicionX": 19, "posicionY": 0 },
+    { "id": 3, "posicionX": 10, "posicionY": 19 }
   ],
   "items": [
-    {
-      "id": 1,
-      "nombre": "Hierro",
-      "tipo": "MATERIAL"
-    },
-    {
-      "id": 2,
-      "nombre": "Circuitos",
-      "tipo": "COMPONENTE"
-    },
-    {
-      "id": 3,
-      "nombre": "Oro",
-      "tipo": "MATERIAL"
-    },
-    {
-      "id": 4,
-      "nombre": "Cables",
-      "tipo": "COMPONENTE"
-    },
-    {
-      "id": 5,
-      "nombre": "Motor",
-      "tipo": "PRODUCTO"
-    },
-    {
-      "id": 6,
-      "nombre": "Puerta",
-      "tipo": "PRODUCTO"
-    }
+    { "id": 1, "nombre": "Hierro", "tipo": "MATERIAL" },
+    { "id": 2, "nombre": "Circuitos", "tipo": "COMPONENTE" },
+    { "id": 3, "nombre": "Oro", "tipo": "MATERIAL" },
+    { "id": 4, "nombre": "Cables", "tipo": "COMPONENTE" },
+    { "id": 5, "nombre": "Motor", "tipo": "PRODUCTO" },
+    { "id": 6, "nombre": "Puerta", "tipo": "PRODUCTO" }
   ]
 }

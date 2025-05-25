@@ -4,6 +4,7 @@ import robopuerto.Robopuerto;
 import robot.Robot;
 import utils.DatosJson;
 import utils.FileReader;
+import utils.Grafo;
 
 import java.util.InputMismatchException;
 import java.util.List;
@@ -37,7 +38,8 @@ public class Main {
 
         EstacionRobot estacion = new EstacionRobot(new Mapa(data.getMapa().getCasilleros()),robopuertos, robots, cofres);
 
-        estacion.mostrarVecinos();
-
+        estacion.getMapa().mostrarMapaConContorno(estacion.getRobopuertos(),estacion.getCofres());
+        estacion.getGrafo().mostrarMatriz();
+        estacion.getGrafo().mostrarNodos();
     }
 }

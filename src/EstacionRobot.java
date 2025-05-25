@@ -2,6 +2,7 @@ import cofre.Cofre;
 import mapa.Mapa;
 import robopuerto.Robopuerto;
 import robot.Robot;
+import utils.Grafo;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -12,6 +13,7 @@ public class EstacionRobot {
     List<Robopuerto> robopuertos;
     List<Robot> robots;
     List<Cofre> cofres;
+    Grafo grafo;
 
     public EstacionRobot(Mapa mapa, List<Robopuerto> robopuertos, List<Robot> robots, List<Cofre> cofres) {
         this.mapa = mapa;
@@ -20,6 +22,7 @@ public class EstacionRobot {
         this.cofres = cofres;
         this.cargarMapa();
         this.calcularRobopuertosVecinos();
+        this.grafo = new Grafo(new ArrayList<>(robopuertos),new ArrayList<>(cofres));
     }
 
     public void mostrarVecinos() {
@@ -54,8 +57,14 @@ public class EstacionRobot {
             }
         }
 
-        //TODO: Ver cofres incluidos en cada robopuerto
-
+        for (Robopuerto robopuerto : this.robopuertos) {
+            for (Cofre cofre : this.cofres) {
+                double distancia = Math.sqrt(Math.pow(cofre.getPosicionX() - robopuerto.getPosicionX(), 2) + Math.pow(cofre.getPosicionY() - robopuerto.getPosicionY(), 2));
+                if (robopuerto.getAlcance() >= distancia) {
+                    robopuerto.getCofresIncluidos().add(cofre);
+                }
+            }
+        }
     }
 
     public void cargarMapa() {
@@ -87,5 +96,21 @@ public class EstacionRobot {
                 mapa.setValue(robot.getPosicionX(), robot.getPosicionY(), Main.ROBOT_EMOJI);
             }
         }
+    }
+
+    public Grafo getGrafo() {
+        return grafo;
+    }
+
+    public Mapa getMapa() {
+        return mapa;
+    }
+
+    public List<Robopuerto> getRobopuertos() {
+        return robopuertos;
+    }
+
+    public List<Cofre> getCofres() {
+        return cofres;
     }
 }
