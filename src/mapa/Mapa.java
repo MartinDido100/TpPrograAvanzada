@@ -1,12 +1,21 @@
 package mapa;
 
+import cofre.Cofre;
+import org.jline.utils.AttributedString;
 import robopuerto.Robopuerto;
 
 import java.util.ArrayList;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.Display;
+import org.jline.utils.InfoCmp;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class Mapa {
     private int casilleros;
-    //Cofres:■, Robopuertos:+, Robots: 🤖
     private String[][] mapa;
 
     public Mapa(int casilleros) {
@@ -56,7 +65,6 @@ public class Mapa {
             System.out.println("|");
         }
 
-        // Imprimir borde inferior
         System.out.print("  ");
         for (int j = 0; j < casilleros; j++) {
             System.out.print("---");
@@ -64,6 +72,67 @@ public class Mapa {
         System.out.println();
     }
 
+    public void mostrarMapaConContorno(List<Robopuerto> robopuertos, List<Cofre> cofres) {
+        boolean[][] contorno = new boolean[casilleros][casilleros];
 
+        // Marcar contorno (solo borde exterior alcance=3)
+        for (Robopuerto r : robopuertos) {
+            int x = r.getPosicionX();
+            int y = r.getPosicionY();
+            int alcance = r.getAlcance();
+
+            for (int i = x - alcance; i <= x + alcance; i++) {
+                for (int j = y - alcance; j <= y + alcance; j++) {
+                    if (i >= 0 && i < casilleros && j >= 0 && j < casilleros) {
+                        // Distancia manhattan o max abs para anillo exterior:
+                        int dx = Math.abs(i - x);
+                        int dy = Math.abs(j - y);
+
+                        // Solo los que están en el borde exterior (max(dx, dy) == alcance)
+                        if (Math.max(dx, dy) == alcance) {
+                            contorno[i][j] = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.print("  ");
+        for (int j = 0; j < casilleros; j++) {
+            System.out.print("---");
+        }
+        System.out.println();
+
+        for (int i = 0; i < casilleros; i++) {
+            System.out.print("|");
+            for (int j = 0; j < casilleros; j++) {
+                String contenido = mapa[i][j];
+                if (contenido == null) contenido = " ";
+
+                // Verificar si hay cofre en (i, j)
+                int finalI = i;
+                int finalJ = j;
+                boolean hayCofre = cofres.stream().anyMatch(c -> c.getPosicionX() == finalI && c.getPosicionY() == finalJ);
+
+                if (contenido.equals("➕")) {
+                    // Robopuerto
+                    System.out.print(String.format(" %-2s", contenido));
+                } else if (contorno[i][j] && !hayCofre) {
+                    // Pintar contorno solo si NO hay cofre
+                    System.out.print(" # ");
+                } else {
+                    // Normal (incluye cofres y otras cosas)
+                    System.out.print(String.format(" %-2s", contenido));
+                }
+            }
+            System.out.println("|");
+        }
+
+        System.out.print("  ");
+        for (int j = 0; j < casilleros; j++) {
+            System.out.print("---");
+        }
+        System.out.println();
+    }
 
 }

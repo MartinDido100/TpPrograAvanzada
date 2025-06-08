@@ -4,9 +4,9 @@ public class Cofre {
     private int posicionX;
     private int posicionY;
     private int id;
-    private String tipo;
+    private TipoCofre tipo;
 
-    public Cofre(int posicionX, int posicionY, int id, String tipo) {
+    public Cofre(int posicionX, int posicionY, int id, TipoCofre tipo) {
         this.posicionX = posicionX;
         this.posicionY = posicionY;
         this.id = id;
@@ -25,7 +25,7 @@ public class Cofre {
         return id;
     }
 
-    public String getTipo() {
+    public TipoCofre getTipo() {
         return tipo;
     }
 
