@@ -1,16 +1,14 @@
 package cofre;
 
-public class Cofre {
-    private int posicionX;
-    private int posicionY;
-    private int id;
-    private TipoCofre tipo;
+public abstract class Cofre {
+    protected int posicionX;
+    protected int posicionY;
+    protected int id;
 
-    public Cofre(int posicionX, int posicionY, int id, TipoCofre tipo) {
+    public Cofre(int posicionX, int posicionY, int id) {
         this.posicionX = posicionX;
         this.posicionY = posicionY;
         this.id = id;
-        this.tipo = tipo;
     }
 
     public int getPosicionX() {
@@ -24,9 +22,4 @@ public class Cofre {
     public int getId() {
         return id;
     }
-
-    public TipoCofre getTipo() {
-        return tipo;
-    }
-
 }

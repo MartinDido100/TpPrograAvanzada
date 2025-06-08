@@ -1,4 +1,4 @@
-import cofre.Cofre;
+import cofre.*;
 import mapa.Mapa;
 import robopuerto.Robopuerto;
 import robot.Robot;
@@ -31,12 +31,32 @@ public class Main {
                 robot -> new Robot(robot.getPosicionX(),robot.getPosicionY(),robot.getId())
         ).toList();
 
-        List<Cofre> cofres = data.getCofres().stream().map(
-                cofre -> new Cofre(cofre.getPosicionX(),cofre.getPosicionY(),cofre.getId(),cofre.getTipo())
-        ).toList();
+        EstacionRobot estacion = new EstacionRobot(new Mapa(data.getMapa().getCasilleros()),robopuertos, robots);
 
+        data.getCofres().forEach(
+                cofre -> {
+                    switch (cofre.getTipo()){
+                        case ACTIVO -> {
+                            estacion.addCofreActivo(new CofreProvisionActiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
+                        }
+                        case PASIVO -> {
+                            estacion.addCofrePasivo(new CofreProvisionPasiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
+                        }
+                        case BUFER -> {
+                            estacion.addRequestChest(new CofreBuffer(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
+                        }
+                        case ALMACENAMIENTO -> {
+                            estacion.addCofreAlmacenamiento(new CofreAlmacenamiento(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
+                        }
+                        case SOLICITUD -> {
+                            estacion.addRequestChest(new CofreSolicitud(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
+                        }
+                        default -> throw new InputMismatchException("Tipo de cofre no reconocido");
+                    }
+                }
+        );
 
-        EstacionRobot estacion = new EstacionRobot(new Mapa(data.getMapa().getCasilleros()),robopuertos, robots, cofres);
+        estacion.setup();
 
         estacion.getMapa().mostrarMapaConContorno(estacion.getRobopuertos(),estacion.getCofres());
         estacion.getGrafo().mostrarMatriz();

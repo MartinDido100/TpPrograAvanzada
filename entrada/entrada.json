@@ -2,21 +2,17 @@
   "mapa": {
     "robopuertos": [
       { "posicionX": 5, "posicionY": 5, "id": 1 },
-      { "posicionX": 5, "posicionY": 6, "id": 2 },
-      { "posicionX": 15, "posicionY": 15, "id": 3 }
+      { "posicionX": 9, "posicionY": 10, "id": 2 }
     ],
     "casilleros": 20
   },
   "cofres": [
-    { "posicionX": 6, "posicionY": 5, "id": 1, "tipo": "SOLICITUD" },
-    { "posicionX": 10, "posicionY": 10, "id": 2, "tipo": "ACTIVO" },
-    { "posicionX": 16, "posicionY": 15, "id": 3, "tipo": "PASIVO" },
-    { "posicionX": 0, "posicionY": 0, "id": 4, "tipo": "BUFER" }
+    { "posicionX": 7, "posicionY": 8, "id": 2, "tipo": "SOLICITUD" },
+    { "posicionX": 11, "posicionY": 11, "id": 3, "tipo": "PASIVO" }
   ],
   "robots": [
-    { "id": 1, "posicionX": 0, "posicionY": 19 },
-    { "id": 2, "posicionX": 19, "posicionY": 0 },
-    { "id": 3, "posicionX": 10, "posicionY": 19 }
+    { "id": 5, "posicionX": 5, "posicionY": 1 },
+    { "id": 9, "posicionX": 11, "posicionY": 1 }
   ],
   "items": [
     { "id": 1, "nombre": "Hierro", "tipo": "MATERIAL" },

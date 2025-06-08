@@ -1,4 +1,4 @@
-import cofre.Cofre;
+import cofre.*;
 import mapa.Mapa;
 import robopuerto.Robopuerto;
 import robot.Robot;
@@ -12,25 +12,72 @@ public class EstacionRobot {
     Mapa mapa;
     List<Robopuerto> robopuertos;
     List<Robot> robots;
-    List<Cofre> cofres;
+    List<CofreProvisionActiva> cofresActivos;
+    List<CofreProvisionPasiva> cofresPasivos;
+    List<CofreAlmacenamiento> cofresAlmacenamiento;
+    List<Cofre> pedidos;
+    List<Cofre>cofres;
     Grafo grafo;
 
-    public EstacionRobot(Mapa mapa, List<Robopuerto> robopuertos, List<Robot> robots, List<Cofre> cofres) {
+    public EstacionRobot(Mapa mapa, List<Robopuerto> robopuertos, List<Robot> robots) {
         this.mapa = mapa;
         this.robopuertos = robopuertos;
         this.robots = robots;
-        this.cofres = cofres;
         this.cargarMapa();
-        this.calcularRobopuertosVecinos();
-        this.grafo = new Grafo(new ArrayList<>(robopuertos),new ArrayList<>(cofres));
     }
 
-    public void mostrarVecinos() {
+    public void mostrarVecinos() { //DEBUG
         for (Robopuerto robopuerto : this.robopuertos) {
             System.out.println("Robopuerto " + robopuerto.getId() + " tiene los siguientes robopuertos vecinos:");
             for (Robopuerto vecino : robopuerto.getRobopuertosVecinos()) {
                 System.out.println("Robopuerto " + vecino.getId());
             }
+        }
+    }
+
+    public void setup(){
+        List<Cofre> cofres = new ArrayList<>();
+        cofres.addAll(cofresPasivos);
+        cofres.addAll(cofresActivos);
+        cofres.addAll(cofresAlmacenamiento);
+        cofres.addAll(pedidos);
+        this.cofres = cofres;
+
+        this.calcularRobopuertosVecinos();
+        this.grafo = new Grafo(new ArrayList<>(robopuertos),new ArrayList<>(cofres));
+    }
+
+    public void addCofrePasivo(CofreProvisionPasiva cofre) {
+        if (cofre != null) {
+            this.cofresPasivos.add(cofre);
+            mapa.setValue(cofre.getPosicionX(), cofre.getPosicionY(), Main.COFRE);
+        }
+    }
+
+    public void addCofreActivo(CofreProvisionActiva cofre) {
+        if (cofre != null) {
+            this.cofresActivos.add(cofre);
+            mapa.setValue(cofre.getPosicionX(), cofre.getPosicionY(), Main.COFRE);
+        }
+    }
+
+    public void addCofreAlmacenamiento(CofreAlmacenamiento cofre) {
+        if (cofre != null) {
+            this.cofresAlmacenamiento.add(cofre);
+            mapa.setValue(cofre.getPosicionX(), cofre.getPosicionY(), Main.COFRE);
+        }
+    }
+
+    public void addRequestChest(Cofre requestChest) {
+        if (requestChest != null) {
+            this.pedidos.add(requestChest);
+            mapa.setValue(requestChest.getPosicionX(), requestChest.getPosicionY(), Main.COFRE);
+        }
+    }
+
+    public void atenderPedidos(){
+        for (Cofre cofre : this.pedidos) {
+            this.grafo.obtenerRobotMasCercanoYCaminoACofre(cofre, new ArrayList<>(this.robots));
         }
     }
 
