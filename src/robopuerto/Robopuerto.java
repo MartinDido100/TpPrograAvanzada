@@ -1,6 +1,7 @@
 package robopuerto;
 
 import cofre.Cofre;
+import robot.Robot;
 
 import java.util.ArrayList;
 
@@ -11,6 +12,7 @@ public class Robopuerto {
     private int id;
     private ArrayList<Robopuerto> robopuertosVecinos;
     private ArrayList<Cofre> cofresIncluidos;
+    private ArrayList<Robot> robotsActuales;
 
     public Robopuerto(int posicionX, int posicionY, int id) {
         this.posicionX = posicionX;
@@ -18,6 +20,7 @@ public class Robopuerto {
         this.id = id;
         this.robopuertosVecinos = new ArrayList<>();
         this.cofresIncluidos = new ArrayList<>();
+        this.robotsActuales = new ArrayList<>();
     }
 
     public int getPosicionX() {
@@ -43,4 +46,6 @@ public class Robopuerto {
     public ArrayList<Cofre> getCofresIncluidos() {
         return cofresIncluidos;
     }
+
+    public ArrayList<Robot> getRobotsActuales() { return robotsActuales; }
 }
