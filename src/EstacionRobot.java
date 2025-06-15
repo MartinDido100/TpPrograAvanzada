@@ -3,6 +3,7 @@ import mapa.Mapa;
 import robopuerto.Robopuerto;
 import robot.Robot;
 import utils.Grafo;
+import utils.ResultadoDijkstra;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -23,7 +24,11 @@ public class EstacionRobot {
         this.mapa = mapa;
         this.robopuertos = robopuertos;
         this.robots = robots;
-        this.cargarMapa();
+        this.pedidos = new ArrayList<>();
+        this.cofresActivos = new ArrayList<>();
+        this.cofresPasivos = new ArrayList<>();
+        this.cofresAlmacenamiento = new ArrayList<>();
+        this.cofres = new ArrayList<>();
     }
 
     public void mostrarVecinos() { //DEBUG
@@ -42,8 +47,20 @@ public class EstacionRobot {
         cofres.addAll(cofresAlmacenamiento);
         cofres.addAll(pedidos);
         this.cofres = cofres;
+        this.cargarMapa();
+
+        for(Robot rob : this.robots){
+            for (Robopuerto robopuerto : this.robopuertos) {
+                if (rob.getPosicionX() == robopuerto.getPosicionX() && rob.getPosicionY() == robopuerto.getPosicionY()) {
+                    robopuerto.getRobotsActuales().add(rob);
+                }
+            }
+        }
 
         this.calcularRobopuertosVecinos();
+        for (Robopuerto robopuerto : this.robopuertos) {
+            System.out.println(robopuerto.getRobopuertosVecinos());
+        }
         this.grafo = new Grafo(new ArrayList<>(robopuertos),new ArrayList<>(cofres));
     }
 
@@ -77,7 +94,12 @@ public class EstacionRobot {
 
     public void atenderPedidos(){
         for (Cofre cofre : this.pedidos) {
-            this.grafo.obtenerRobotMasCercanoYCaminoACofre(cofre, new ArrayList<>(this.robots));
+            ResultadoDijkstra res = this.grafo.dijkstra(cofre);
+            if(res != null){
+            System.out.println(res.distancia);
+            System.out.println(res.camino);
+            System.out.println(res.robot.getId());
+            }
         }
     }
 
@@ -86,7 +108,7 @@ public class EstacionRobot {
             for (Robopuerto otroRobopuerto : this.robopuertos) {
                 double distancia = Math.sqrt(Math.pow(otroRobopuerto.getPosicionX() - robopuerto.getPosicionX(), 2) + Math.pow(otroRobopuerto.getPosicionY() - robopuerto.getPosicionY(), 2));
                 if (robopuerto != otroRobopuerto && (robopuerto.getAlcance()*2) >= distancia) {
-                    robopuerto.getRobopuertosVecinos().add(otroRobopuerto);
+                    robopuerto.addVecino(otroRobopuerto);
                 }
             }
         }
@@ -98,7 +120,7 @@ public class EstacionRobot {
                 for (Robopuerto vecinoDelVecino : vecino.getRobopuertosVecinos()) {
                     if (!robopuerto.getRobopuertosVecinos().contains(vecinoDelVecino)
                             && !vecinoDelVecino.equals(robopuerto)) {
-                        robopuerto.getRobopuertosVecinos().add(vecinoDelVecino);
+                        robopuerto.addVecino(vecinoDelVecino);
                     }
                 }
             }
@@ -108,7 +130,18 @@ public class EstacionRobot {
             for (Cofre cofre : this.cofres) {
                 double distancia = Math.sqrt(Math.pow(cofre.getPosicionX() - robopuerto.getPosicionX(), 2) + Math.pow(cofre.getPosicionY() - robopuerto.getPosicionY(), 2));
                 if (robopuerto.getAlcance() >= distancia) {
-                    robopuerto.getCofresIncluidos().add(cofre);
+                    robopuerto.addCofreIncluido(cofre);
+                }
+            }
+        }
+
+        for (Robopuerto robopuerto : this.robopuertos) {
+            List<Robopuerto> vecinos = robopuerto.getRobopuertosVecinos();
+            for (Robopuerto vecino : vecinos) {
+                for (Cofre cofre : vecino.getCofresIncluidos()) {
+                    if (!robopuerto.getCofresIncluidos().contains(cofre)) {
+                        robopuerto.addCofreIncluido(cofre);
+                    }
                 }
             }
         }
@@ -135,9 +168,7 @@ public class EstacionRobot {
         }
 
         for (Robot robot : robots) {
-            if (mapa.getValue(robot.getPosicionX(), robot.getPosicionY()).equals(Main.COFRE) || mapa.getValue(robot.getPosicionX(), robot.getPosicionY()).equals(Main.ROBOPUERTO)) {
-                throw new InputMismatchException("Error en el archivo de entrada: no se puede colocar un robot en la misma posicion que un cofre o un robopuerto");
-            } else if (robot.getPosicionX() > mapa.getCasilleros() || robot.getPosicionY() > mapa.getCasilleros()) {
+            if (robot.getPosicionX() > mapa.getCasilleros() || robot.getPosicionY() > mapa.getCasilleros()) {
                 throw new InputMismatchException("Error en el archivo de entrada: posicion del robot fuera de rango");
             } else{
                 mapa.setValue(robot.getPosicionX(), robot.getPosicionY(), Main.ROBOT_EMOJI);

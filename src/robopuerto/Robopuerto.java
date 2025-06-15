@@ -48,4 +48,12 @@ public class Robopuerto {
     }
 
     public ArrayList<Robot> getRobotsActuales() { return robotsActuales; }
+
+    public void addVecino(Robopuerto vecino) {
+        this.robopuertosVecinos.add(vecino);
+    }
+
+    public void addCofreIncluido(Cofre cofre) {
+        this.cofresIncluidos.add(cofre);
+    }
 }

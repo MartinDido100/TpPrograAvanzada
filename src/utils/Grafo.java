@@ -39,16 +39,14 @@ public class Grafo {
         for (int i = 0; i < robopuertos.size(); i++) {
             Robopuerto r1 = robopuertos.get(i);
 
-            // Robopuerto ↔ Robopuerto
             for (int j = 0; j < robopuertos.size(); j++) {
                 if (i == j) continue;
 
                 Robopuerto r2 = robopuertos.get(j);
                 double distancia = calcularDistancia(r1.getPosicionX(), r1.getPosicionY(), r2.getPosicionX(), r2.getPosicionY());
-
-                if (distancia <= r1.getAlcance() * 2) {
+                if (distancia <= r1.getAlcance() * 2 || r1.getRobopuertosVecinos().contains(r2)) {
                     matrizAdyacencia[i][j] = distancia;
-                    matrizAdyacencia[j][i] = distancia; // conexión bidireccional
+                    matrizAdyacencia[j][i] = distancia;
                 }
                 else
                 {
@@ -57,13 +55,11 @@ public class Grafo {
                 }
             }
 
-            // Robopuerto ↔ Cofre
             for (int k = 0; k < cofres.size(); k++) {
                 Cofre c = cofres.get(k);
                 int j = offset + k;
                 double distancia = calcularDistancia(r1.getPosicionX(), r1.getPosicionY(), c.getPosicionX(), c.getPosicionY());
-
-                if (distancia <= r1.getAlcance()) {
+                if (distancia <= r1.getAlcance() || r1.getCofresIncluidos().contains(c)) {
                     matrizAdyacencia[i][j] = distancia;
                     matrizAdyacencia[j][i] = distancia; // conexión inversa
                 }
@@ -71,6 +67,39 @@ public class Grafo {
                 {
                     matrizAdyacencia[i][j] = Double.POSITIVE_INFINITY;
                     matrizAdyacencia[j][i] = Double.POSITIVE_INFINITY;
+                }
+            }
+        }
+
+        for (int i = 0; i < cofres.size(); i++) {
+            Cofre c1 = cofres.get(i);
+            int indexC1 = offset + i;
+
+            for (int j = 0; j < cofres.size(); j++) {
+                if (i == j) continue;
+
+                Cofre c2 = cofres.get(j);
+                int indexC2 = offset + j;
+
+                boolean conectados = false;
+
+                for (Robopuerto r : robopuertos) {
+                    boolean incluyeC1 = r.getCofresIncluidos().stream().anyMatch(c -> c.getId() == c1.getId());
+                    boolean incluyeC2 = r.getCofresIncluidos().stream().anyMatch(c -> c.getId() == c2.getId());
+
+                    if (incluyeC1 && incluyeC2) {
+                        conectados = true;
+                        break;
+                    }
+                }
+
+                if (conectados) {
+                    double distancia = calcularDistancia(c1.getPosicionX(), c1.getPosicionY(), c2.getPosicionX(), c2.getPosicionY());
+                    matrizAdyacencia[indexC1][indexC2] = distancia;
+                    matrizAdyacencia[indexC2][indexC1] = distancia;
+                } else {
+                    matrizAdyacencia[indexC1][indexC2] = Double.POSITIVE_INFINITY;
+                    matrizAdyacencia[indexC2][indexC1] = Double.POSITIVE_INFINITY;
                 }
             }
         }
