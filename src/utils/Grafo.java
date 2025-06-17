@@ -169,21 +169,19 @@ public class Grafo {
 
         double menorDistancia = Double.MAX_VALUE;
         int indiceRobopuerto = -1;
+        Robopuerto robopuertoMasCercano = null;
 
         for (int i = 0; i < this.cantidadRobopuertos; i++) {
-            if (distancia[i] < menorDistancia) {
+            robopuertoMasCercano = (Robopuerto) nodos.get(i);
+            if (distancia[i] < menorDistancia && !robopuertoMasCercano.getRobotsActuales().isEmpty()) {
                 menorDistancia = distancia[i];
                 indiceRobopuerto = i;
             }
         }
 
-        Robopuerto robopuertoMasCercano = (Robopuerto) nodos.get(indiceRobopuerto);
+        robopuertoMasCercano = (Robopuerto)nodos.get(indiceRobopuerto);
 
-        // ya tenemos el robopuerto mas cercano, ahora hay que ver si tiene un robot disponible
-
-        if (!robopuertoMasCercano.getRobotsActuales().isEmpty()) {
-            robotMasCercano = robopuertoMasCercano.getRobotsActuales().getFirst();
-        }
+        robotMasCercano = robopuertoMasCercano.getRobotsActuales().getFirst();
 
         if(robotMasCercano != null){ // si hay algun robot en ese robopuerto
             int actual = indiceRobopuerto;

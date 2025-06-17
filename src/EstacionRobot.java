@@ -1,3 +1,4 @@
+import Item.Item;
 import cofre.*;
 import mapa.Mapa;
 import robopuerto.Robopuerto;
@@ -6,6 +7,7 @@ import utils.Grafo;
 import utils.ResultadoDijkstra;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.InputMismatchException;
 import java.util.List;
 
@@ -16,7 +18,7 @@ public class EstacionRobot {
     List<CofreProvisionActiva> cofresActivos;
     List<CofreProvisionPasiva> cofresPasivos;
     List<CofreAlmacenamiento> cofresAlmacenamiento;
-    List<Cofre> pedidos;
+    List<CofreSolicitador> pedidos;
     List<Cofre>cofres;
     Grafo grafo;
 
@@ -45,7 +47,7 @@ public class EstacionRobot {
         cofres.addAll(cofresPasivos);
         cofres.addAll(cofresActivos);
         cofres.addAll(cofresAlmacenamiento);
-        cofres.addAll(pedidos);
+        cofres.addAll((Collection<? extends Cofre>) pedidos);
         this.cofres = cofres;
         this.cargarMapa();
 
@@ -87,18 +89,46 @@ public class EstacionRobot {
 
     public void addRequestChest(Cofre requestChest) {
         if (requestChest != null) {
-            this.pedidos.add(requestChest);
+            this.pedidos.add((CofreSolicitador) requestChest);
             mapa.setValue(requestChest.getPosicionX(), requestChest.getPosicionY(), Main.COFRE);
         }
     }
 
     public void atenderPedidos(){
-        for (Cofre cofre : this.pedidos) {
-            ResultadoDijkstra res = this.grafo.dijkstra(cofre);
+        for (CofreSolicitador cofre : this.pedidos) {
+
+            Boolean cumplido = false;
+            Item itemSolicitado = cofre.getSolicitudes().getFirst();
+
+            for(CofreProvisionActiva proveedor : this.cofresActivos){
+                // chequeo si hay algun cofre activo que tenga el item, para la prioridad
+                if(proveedor.getOfrecimientos().containsKey(itemSolicitado.getNombre())){
+                    int cantidadProveedor = proveedor.getOfrecimientos().get(itemSolicitado.getNombre());
+                    if(cantidadProveedor >= itemSolicitado.getCantidad()){
+                        proveedor.ofrecer(itemSolicitado.getNombre(), itemSolicitado.getCantidad());
+                        cofre.cumplirSolicitud(itemSolicitado);
+                        cumplido = true;
+                        break;
+                    }
+                }
+            }
+            if(cumplido){
+                continue;
+            }
+            ResultadoDijkstra res = this.grafo.dijkstra((Cofre)cofre);
             if(res != null){
             System.out.println(res.distancia);
             System.out.println(res.camino);
             System.out.println(res.robot.getId());
+            Robot robot = res.robot;
+
+            // obtengo la ruta del cofre al robopuerto
+
+                // TODO: hacer otro dijkstra pero de robot a cofres, del resultado de las distancias, buscar el mas cercano QUE SEA proveedor Y TENGA el item solicitado
+
+                // TODO: hacer otro dijkstra de cofre a cofre, para hacer robot -> cofreProveedor -> cofreSolicitud
+
+                // TODO: hacer otro dijkstra de cofre a robopuerto, para hacer robot -> cofreProveedor -> cofreSolicitud -> robopuerto, se puede modificar el actual
             }
         }
     }
