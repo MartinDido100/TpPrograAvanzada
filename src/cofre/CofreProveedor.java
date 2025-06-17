@@ -8,5 +8,5 @@ public interface CofreProveedor {
 
     public void ofrecer(String item, int cantidad);
     public Map<String, Integer> getOfrecimientos();
-    }
 }
+

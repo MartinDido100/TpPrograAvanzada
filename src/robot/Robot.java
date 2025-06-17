@@ -47,4 +47,10 @@ public class Robot {
         bateriaActual-= (int) distancia*FACTOR_CONSUMO;
 
     }
+
+    public void addItem(Item item){
+        items.add(item);
+    }
+
+
 }
