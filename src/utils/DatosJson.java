@@ -2,6 +2,7 @@ package utils;
 import cofre.TipoCofre;
 
 import java.util.List;
+import java.util.Map;
 
 public class DatosJson {
     private Mapa mapa;
@@ -127,6 +128,8 @@ public class DatosJson {
         private int posicionY;
         private int id;
         private TipoCofre tipo;
+        private Map<String, Integer> itemsOfrecidos;
+        private List<Item> solicitudes;
 
         public int getPosicionX() {
             return posicionX;
@@ -159,12 +162,21 @@ public class DatosJson {
         public void setTipo(TipoCofre tipo) {
             this.tipo = tipo;
         }
+
+        public Map<String, Integer> getItemsOfrecidos(){ return itemsOfrecidos; }
+
+        public void setItemsOfrecidos(Map<String, Integer> itemsOfrecidos){ this.itemsOfrecidos = itemsOfrecidos; }
+
+        public List<Item> getSolicitudes(){ return solicitudes; }
+
+        public void setSolicitudes(List<Item> solicitudes){ this.solicitudes = solicitudes; }
     }
 
     public static class Item {
         private int id;
         private String nombre;
         private String tipo;
+        private int cantidad;
 
         public int getId() {
             return id;
@@ -189,6 +201,10 @@ public class DatosJson {
         public void setTipo(String tipo) {
             this.tipo = tipo;
         }
+
+        public int getCantidad() {return cantidad;}
+
+        public void setCantidad(int cantidad) { this.cantidad = cantidad;}
     }
 }
 

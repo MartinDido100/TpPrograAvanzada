@@ -37,10 +37,10 @@ public class Main {
                 cofre -> {
                     switch (cofre.getTipo()){
                         case ACTIVO -> {
-                            estacion.addCofreActivo(new CofreProvisionActiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
+                            estacion.addCofreActivo(new CofreProvisionActiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(),cofre.getItemsOfrecidos()));
                         }
                         case PASIVO -> {
-                            estacion.addCofrePasivo(new CofreProvisionPasiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
+                            estacion.addCofrePasivo(new CofreProvisionPasiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(),cofre.getItemsOfrecidos()));
                         }
                         case BUFER -> {
                             estacion.addRequestChest(new CofreBuffer(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
@@ -49,7 +49,7 @@ public class Main {
                             estacion.addCofreAlmacenamiento(new CofreAlmacenamiento(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
                         }
                         case SOLICITUD -> {
-                            estacion.addRequestChest(new CofreSolicitud(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
+                            estacion.addRequestChest(new CofreSolicitud(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(),cofre.getSolicitudes()));
                         }
                         default -> throw new InputMismatchException("Tipo de cofre no reconocido");
                     }
@@ -62,5 +62,7 @@ public class Main {
         estacion.getGrafo().mostrarMatriz();
         estacion.getGrafo().mostrarNodos();
         estacion.atenderPedidos();
+
+
     }
 }

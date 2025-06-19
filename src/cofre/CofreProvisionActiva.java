@@ -8,10 +8,10 @@ import java.util.Map;
 public class CofreProvisionActiva extends Cofre implements CofreProveedor {
         protected Map<String, Integer> itemsOfrecidos;
 
-    public CofreProvisionActiva(int posicionX, int posicionY, int id) {
+    public CofreProvisionActiva(int posicionX, int posicionY, int id, Map<String, Integer> itemsOfrecidos) {
 
         super(posicionX, posicionY, id);
-        this.itemsOfrecidos = new HashMap<String, Integer>();
+        this.itemsOfrecidos = itemsOfrecidos;
     }
 
     @Override

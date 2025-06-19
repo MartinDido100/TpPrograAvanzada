@@ -7,8 +7,30 @@
     "casilleros": 20
   },
   "cofres": [
-    { "posicionX": 7, "posicionY": 8, "id": 1, "tipo": "SOLICITUD" },
-    { "posicionX": 11, "posicionY": 11, "id": 2, "tipo": "PASIVO" }
+    { "posicionX": 7,
+      "posicionY": 8,
+      "id": 1, "tipo": "SOLICITUD",
+      "solicitudes":
+      [
+        {
+          "id": 1,
+          "nombre": "Hierro",
+          "tipo": "MATERIAL",
+          "cantidad": 10
+        }
+      ]
+
+    },
+    { "posicionX": 11,
+      "posicionY": 11,
+      "id": 2,
+      "tipo": "PASIVO",
+      "itemsOfrecidos":
+      {
+        "Hierro" : 10
+
+      }
+    }
   ],
   "robots": [
     { "id": 1, "posicionX": 5, "posicionY": 6 },
