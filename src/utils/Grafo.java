@@ -12,7 +12,7 @@ import java.util.*;
 
 public class Grafo {
     private double[][] matrizAdyacencia;
-    private ArrayList<Object> nodos;
+    public ArrayList<Object> nodos;
     private int cantidadRobopuertos;
     private int cantidadCofres;
 
@@ -133,7 +133,7 @@ public class Grafo {
         }
     }
 
-    public ResultadoDijkstra dijkstra(Object origen) {
+    public ResultadoDijkstra obtenerRobopuertoConRobotMasCercano(Object origen) {
         ResultadoDijkstra resul = null;
         List<Object> caminoARobotMasCercano = new ArrayList<>();
         int sucesores[] = new int[this.cantidadRobopuertos]; // despues puedo reconstruir el camino
@@ -205,7 +205,7 @@ public class Grafo {
 
     }
 
-    public ResultadoDijkstra dijkstra(Object origen, Item itemSolicitado) {
+    public ResultadoDijkstra obtenerCofreConObjetoMasCercano(Object origen, Item itemSolicitado) {
         ResultadoDijkstra resul = null;
         List<Object> caminoACofreMasCercano = new ArrayList<>();
         int sucesores[] = new int[matrizAdyacencia.length]; // despues puedo reconstruir el camino
@@ -278,7 +278,7 @@ public class Grafo {
 
     }
 
-    public ResultadoDijkstra dijkstra(Object origen, Object destino) {
+    public ResultadoDijkstra obtenerRutaMasCercana(Object origen, Object destino) {
         ResultadoDijkstra resul = null;
         List<Object> caminoADestino = new ArrayList<>();
         int sucesores[] = new int[matrizAdyacencia.length]; // despues puedo reconstruir el camino
@@ -334,7 +334,7 @@ public class Grafo {
 
     }
 
-    public ResultadoDijkstra dijkstra(CofreSolicitador origen) {
+    public ResultadoDijkstra obtenerRobopuertoMasCercano(CofreSolicitador origen) {
         ResultadoDijkstra resul = null;
         List<Object> caminoARobopuertoMasCercano = new ArrayList<>();
         int sucesores[] = new int[this.cantidadRobopuertos]; // despues puedo reconstruir el camino
@@ -399,4 +399,101 @@ public class Grafo {
         return resul;
 
     }
+
+    public Object getNodo(int indice) {
+        return nodos.get(indice);
+    }
+
+    public int getIndice(Object nodo) {
+        return nodos.indexOf(nodo);
+    }
+
+    public boolean esRobopuerto(int indice) {
+        return indice < cantidadRobopuertos;
+    }
+
+
+
+    private double getDistancia(int nodo, int vecino) {
+        return matrizAdyacencia[nodo][vecino];
+    }
+
+
+
+    public ResultadoDijkstra planificarRutaConRecargas(int origen, int destino, int bateriaInicial, int bateriaMaxima) {
+        class Estado {
+            int nodo;
+            int bateriaRestante;
+            List<Object> camino;
+            double distanciaTotal;
+
+            Estado(int nodo, int bateriaRestante, List<Object> camino, double distanciaTotal) {
+                this.nodo = nodo;
+                this.bateriaRestante = bateriaRestante;
+                this.camino = camino;
+                this.distanciaTotal = distanciaTotal;
+            }
+        }
+
+        PriorityQueue<Estado> cola = new PriorityQueue<>(Comparator.comparingDouble(e -> e.distanciaTotal));
+        Map<Integer, Integer> mejorBateriaEnNodo = new HashMap<>();
+
+        List<Object> caminoInicial = new ArrayList<>();
+        caminoInicial.add(getNodo(origen));
+
+        cola.add(new Estado(origen, bateriaInicial, caminoInicial, 0));
+        System.out.println("🔄 Iniciando planificación desde nodo: " + getNodo(origen) + " hacia nodo: " + getNodo(destino));
+
+        while (!cola.isEmpty()) {
+            Estado actual = cola.poll();
+
+            System.out.println("📍 Evaluando nodo: " + getNodo(actual.nodo) + ", batería: " + actual.bateriaRestante);
+
+            if (mejorBateriaEnNodo.containsKey(actual.nodo)
+                    && mejorBateriaEnNodo.get(actual.nodo) >= actual.bateriaRestante) {
+                System.out.println("⛔ Ya visitado con igual o más batería. Se omite.");
+                continue;
+            }
+            mejorBateriaEnNodo.put(actual.nodo, actual.bateriaRestante);
+
+            if (actual.nodo == destino) {
+                System.out.println("✅ Se llegó al destino: " + getNodo(actual.nodo));
+                return new ResultadoDijkstra(getNodo(actual.nodo), actual.camino, actual.distanciaTotal);
+            }
+
+            for (int vecino = 0; vecino < matrizAdyacencia.length; vecino++) {
+                double distancia = getDistancia(actual.nodo, vecino);
+                if (distancia == Double.POSITIVE_INFINITY) continue;
+
+                int consumo = (int) Math.ceil(distancia * Robot.getFactorConsumo());
+                int nuevaBateria = actual.bateriaRestante - consumo;
+
+                System.out.print("➡️ Intentando ir a " + getNodo(vecino) + " (distancia: " + distancia + ", consumo: " + consumo + ")... ");
+
+                if (nuevaBateria < 0) {
+                    System.out.println("❌ No alcanza la batería.");
+                    continue;
+                }
+
+                if (esRobopuerto(vecino)) {
+                    nuevaBateria = bateriaMaxima;
+                    System.out.println("⚡ Es robopuerto, recarga batería.");
+                } else {
+                    System.out.println("✔️ Llega sin recarga.");
+                }
+
+                List<Object> nuevoCamino = new ArrayList<>(actual.camino);
+                nuevoCamino.add(getNodo(vecino));
+
+                cola.add(new Estado(vecino, nuevaBateria, nuevoCamino, actual.distanciaTotal + distancia));
+            }
+        }
+
+        System.out.println("🚫 No se encontró una ruta viable desde " + getNodo(origen) + " hasta " + getNodo(destino));
+        return null;
+    }
+
+
+
+
 }

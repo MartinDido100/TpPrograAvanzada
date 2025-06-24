@@ -9,9 +9,9 @@ public class Robot {
     private int id;
     private int posicionX;
     private int posicionY;
-    private static final int BATERIA_TOTAL = 100; //cantidad de celulas
+    private static final int BATERIA_TOTAL = 10; //cantidad de celulas
     private int bateriaActual;
-    private static final int FACTOR_CONSUMO = 1; //consumo de celulas
+    private static final double FACTOR_CONSUMO = 1.5; //consumo de celulas
     List<Item> items;
 
     public Robot(int id, int posicionX, int posicionY) {
@@ -48,8 +48,20 @@ public class Robot {
 
     }
 
+    public boolean alcanzaBateria(double distancia){
+        return bateriaActual >= distancia*FACTOR_CONSUMO;
+    }
+
     public void addItem(Item item){
         items.add(item);
+    }
+
+    public static double getFactorConsumo(){
+        return FACTOR_CONSUMO;
+    }
+
+    public static int getBateriaTotal(){
+        return BATERIA_TOTAL;
     }
 
 
