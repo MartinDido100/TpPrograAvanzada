@@ -117,10 +117,10 @@ public class EstacionRobot {
                 }
                 ResultadoDijkstra rutaCofreARobot = this.grafo.obtenerRobopuertoConRobotMasCercano((Cofre)cofre); // me devuelve el robopuerto con robot disponible mas cercano
 
-                if(rutaCofreARobot != null){
+                if(rutaCofreARobot != null){ // si no hay robot disponible, no puedo cumplir con el pedido
                     Robopuerto robopuertoConRobotMasCercano = (Robopuerto)rutaCofreARobot.nodo;
                     Robot robot = robopuertoConRobotMasCercano.getRobotsActuales().removeFirst();
-                    int bateriaActual = robot.getBateriaActual(); // al estar en un robopuerto, deberia estar al 100%
+
                     System.out.println(rutaCofreARobot.distancia);
                     System.out.println(rutaCofreARobot.camino);
                     System.out.println(robot.getId());
@@ -132,120 +132,68 @@ public class EstacionRobot {
 
                     ResultadoDijkstra rutaACofreProveedor = this.grafo.obtenerCofreConObjetoMasCercano(robopuertoConRobotMasCercano,itemSolicitado); // robopuerto a proveecdor
                     CofreProveedor proveedor = (CofreProveedor) rutaACofreProveedor.nodo;
-                    System.out.println(rutaACofreProveedor.distancia);
-                    ResultadoDijkstra rutaACofreSolicitante = this.grafo.obtenerRutaMasCercana(proveedor,cofre); // proveedor a solicitante
-                    System.out.println(rutaACofreSolicitante.distancia);
                     ResultadoDijkstra rutaARobopuertoMasCercano = this.grafo.obtenerRobopuertoMasCercano(cofre); // solicitante a robopuerto
                     Robopuerto robopuertoMasCercano = (Robopuerto)rutaARobopuertoMasCercano.nodo;
-                    System.out.println(rutaARobopuertoMasCercano.distancia);
 
-                    double distanciaTotal = rutaACofreProveedor.distancia+rutaACofreSolicitante.distancia+rutaARobopuertoMasCercano.distancia;
-
-                    System.out.println(distanciaTotal);
-                    if(!robot.alcanzaBateria(distanciaTotal)){
-                        // hay que ver como hacer para pasar por un robopuerto y recargar en el medio
-                        // Paso 1: del robopuerto del robot al cofre proveedor
-                        int indiceRobopuertoOrigen = grafo.nodos.indexOf(robopuertoConRobotMasCercano);
-                        int indiceCofreProveedor = grafo.nodos.indexOf(proveedor);
-                        int indiceCofreSolicitador = grafo.nodos.indexOf(cofre);
-                        int indiceRobopuertoMasCercano = grafo.nodos.indexOf(robopuertoMasCercano);
-                        ResultadoDijkstra tramo1 = grafo.planificarRutaConRecargas(
+                    // Paso 1: del robopuerto del robot al cofre proveedor
+                    int indiceRobopuertoOrigen = grafo.nodos.indexOf(robopuertoConRobotMasCercano);
+                    int indiceCofreProveedor = grafo.nodos.indexOf(proveedor);
+                    int indiceCofreSolicitador = grafo.nodos.indexOf(cofre);
+                    int indiceRobopuertoMasCercano = grafo.nodos.indexOf(robopuertoMasCercano);
+                    ResultadoDijkstra tramo1 = grafo.planificarRutaConRecargas(
                                 indiceRobopuertoOrigen,
                                 indiceCofreProveedor,
-                                robot.getBateriaActual(),
-                                Robot.getBateriaTotal()
-                        );
+                                robot
+                        ); // puede ir directo o parar a recargar, este algoritmo sirve para ambos
+                    // no recarga la bateria real del robot, toma como una bateria virtual, para eso el metodo de abajo
 
-                        if (tramo1 == null) {
-                            System.out.println("No se puede llegar al cofre proveedor.");
-                            return;
-                        }
+                    if (tramo1 == null) {
+                        System.out.println("No se puede llegar al cofre proveedor.");
+                        return;
+                    }
 
-                        // Paso 2: del cofre proveedor al cofre solicitador (con batería llena)
-                        ResultadoDijkstra tramo2 = grafo.planificarRutaConRecargas(
+                    grafo.aplicarRuta(tramo1,robot); // aplicar ruta lo que hace es consumir la bateria real del robot, y decir que ruta tomo hasta el objetivo
+
+                    // Paso 2: del cofre proveedor al cofre solicitador (con batería llena)
+                    ResultadoDijkstra tramo2 = grafo.planificarRutaConRecargas(
                                 indiceCofreProveedor,
                                 indiceCofreSolicitador,
-                                Robot.getBateriaTotal(),
-                                Robot.getBateriaTotal()
-                        );
+                                robot
+                    );
 
-                        if (tramo2 == null) {
-                            System.out.println("No se puede entregar desde proveedor al solicitador.");
-                            return;
-                        }
+                    if (tramo2 == null) {
+                        System.out.println("No se puede entregar desde proveedor al solicitador.");
+                        return;
+                    }
 
-                        // Paso 3: del cofre solicitador al robopuerto más cercano (para que el robot recargue)
-                        ResultadoDijkstra tramo3 = grafo.planificarRutaConRecargas(
+                    grafo.aplicarRuta(tramo2,robot);
+
+                    // Paso 3: del cofre solicitador al robopuerto más cercano (para que el robot recargue)
+                    ResultadoDijkstra tramo3 = grafo.planificarRutaConRecargas(
                                 indiceCofreSolicitador,
                                 indiceRobopuertoMasCercano,
-                                Robot.getBateriaTotal(),
-                                Robot.getBateriaTotal()
-                        );
+                                robot
+                    );
 
 
-                        if (tramo3 == null) {
-                            System.out.println("No se puede regresar a ningún robopuerto después de entregar.");
-                            return;
-                        }
-
-                        // ✅ Si llegaste acá, tenés todos los tramos viables:
-                        System.out.println("Ruta total:");
-                        System.out.println("Tramo 1 (al proveedor):");
-                        tramo1.camino.forEach(System.out::println);
-
-                        System.out.println("Tramo 2 (al solicitador):");
-                        tramo2.camino.forEach(System.out::println);
-
-                        System.out.println("Tramo 3 (a recarga final):");
-                        tramo3.camino.forEach(System.out::println);
-
-                    // Podés concatenar los caminos o mover paso a paso
-                    }
-                    else
-                    {
-                        // flujo normal
+                    if (tramo3 == null) {
+                        System.out.println("No se puede regresar a ningún robopuerto después de entregar.");
+                        return;
                     }
 
+                    grafo.aplicarRuta(tramo3,robot);
+                    // ✅ Si llegaste acá, tenés todos los tramos viables:
+                    System.out.println("Ruta total:");
+                    System.out.println("Tramo 1 (al proveedor):");
+                    tramo1.camino.forEach(System.out::println);
+
+                    System.out.println("Tramo 2 (al solicitador):");
+                    tramo2.camino.forEach(System.out::println);
+
+                    System.out.println("Tramo 3 (a recarga final):");
+                    tramo3.camino.forEach(System.out::println);
 
 
-                    //***************** LO DE ABAJO ES SIN LA BATERIA******
-
-                   /*if(rutaACofreProveedor != null){
-                        CofreProveedor proveedor = (CofreProveedor) rutaACofreProveedor.nodo;
-                        proveedor.ofrecer(itemSolicitado.getNombre(), itemSolicitado.getCantidad()); // saco la cantidad solicitada del cofre proveedor
-                        robot.addItem(itemSolicitado); // el robot carga con el item solicitados
-
-                        System.out.println("El robot " + robot.getId() + " recoge el item " + itemSolicitado.getNombre() + " del cofre proveedor " + ((Cofre) proveedor).getId());
-                        System.out.println(rutaACofreProveedor.distancia);
-                        System.out.println(rutaACofreProveedor.camino);
-                        // ya tengo los items, ahora tengo que ir al cofre de solicitud para entregar el item solicitado
-
-                        ResultadoDijkstra rutaACofreSolicitante = this.grafo.obtenerRutaMasCercana(proveedor,cofre);
-
-                        if(rutaACofreSolicitante != null){
-
-                            System.out.println("El robot " + robot.getId() + " lleva el item " + itemSolicitado.getNombre() + " al cofre " + ((Cofre) cofre).getId());
-                            System.out.println(rutaACofreSolicitante.distancia);
-                            System.out.println(rutaACofreSolicitante.camino);
-                            cofre.cumplirSolicitud(itemSolicitado);
-                            robot.getItems().remove(itemSolicitado);
-                            // ahora falta calcular la ruta a algun robopuerto para finalizar el trabajo del robot
-
-                            ResultadoDijkstra rutaARobopuertoMasCercano = this.grafo.obtenerRobopuertoMasCercano(cofre);
-
-                            if(rutaARobopuertoMasCercano != null){
-
-                                Robopuerto robopuertoMasCercano = (Robopuerto)rutaARobopuertoMasCercano.nodo;
-                                robopuertoMasCercano.getRobotsActuales().add(robot);
-                                robot.recargar();
-                                System.out.println("El robot " + robot.getId() + " vuelve al robopuerto " + robopuertoMasCercano.getId() + " y concluye su tarea ");
-                                System.out.println(rutaARobopuertoMasCercano.distancia);
-                                System.out.println(rutaARobopuertoMasCercano.camino);
-                            }
-                        }
-
-
-                    }*/
 
 
                 }

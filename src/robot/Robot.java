@@ -9,8 +9,8 @@ public class Robot {
     private int id;
     private int posicionX;
     private int posicionY;
-    private static final int BATERIA_TOTAL = 10; //cantidad de celulas
-    private int bateriaActual;
+    private static final double BATERIA_TOTAL = 10; //cantidad de celulas
+    private double bateriaActual;
     private static final double FACTOR_CONSUMO = 1.5; //consumo de celulas
     List<Item> items;
 
@@ -33,7 +33,7 @@ public class Robot {
     public int getPosicionY() {
         return posicionY;
     }
-    public int getBateriaActual() {
+    public double getBateriaActual() {
         return bateriaActual;
     }
     public List<Item> getItems() {
@@ -44,7 +44,7 @@ public class Robot {
         bateriaActual = BATERIA_TOTAL;
     }
     public void consumirBateria(double distancia){
-        bateriaActual-= (int) distancia*FACTOR_CONSUMO;
+        bateriaActual-=  distancia*FACTOR_CONSUMO;
 
     }
 
@@ -60,7 +60,7 @@ public class Robot {
         return FACTOR_CONSUMO;
     }
 
-    public static int getBateriaTotal(){
+    public static double getBateriaTotal(){
         return BATERIA_TOTAL;
     }
 

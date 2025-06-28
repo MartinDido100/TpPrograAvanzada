@@ -278,7 +278,7 @@ public class Grafo {
 
     }
 
-    public ResultadoDijkstra obtenerRutaMasCercana(Object origen, Object destino) {
+    public ResultadoDijkstra obtenerMejorRuta(Object origen, Object destino) {
         ResultadoDijkstra resul = null;
         List<Object> caminoADestino = new ArrayList<>();
         int sucesores[] = new int[matrizAdyacencia.length]; // despues puedo reconstruir el camino
@@ -334,7 +334,7 @@ public class Grafo {
 
     }
 
-    public ResultadoDijkstra obtenerRobopuertoMasCercano(CofreSolicitador origen) {
+    public ResultadoDijkstra obtenerRobopuertoMasCercano(Object origen) {
         ResultadoDijkstra resul = null;
         List<Object> caminoARobopuertoMasCercano = new ArrayList<>();
         int sucesores[] = new int[this.cantidadRobopuertos]; // despues puedo reconstruir el camino
@@ -420,14 +420,14 @@ public class Grafo {
 
 
 
-    public ResultadoDijkstra planificarRutaConRecargas(int origen, int destino, int bateriaInicial, int bateriaMaxima) {
+    public ResultadoDijkstra planificarRutaConRecargas(int origen, int destino, Robot robot) {
         class Estado {
             int nodo;
-            int bateriaRestante;
+            double bateriaRestante;
             List<Object> camino;
             double distanciaTotal;
 
-            Estado(int nodo, int bateriaRestante, List<Object> camino, double distanciaTotal) {
+            Estado(int nodo, double bateriaRestante, List<Object> camino, double distanciaTotal) {
                 this.nodo = nodo;
                 this.bateriaRestante = bateriaRestante;
                 this.camino = camino;
@@ -435,14 +435,30 @@ public class Grafo {
             }
         }
 
+        boolean debeRecargar = false;
+        double distanciaADestino = this.getDistancia(origen, destino);
+        if(!esRobopuerto(destino) && robot.alcanzaBateria(distanciaADestino)) { // debo asegurarme que no queda en el aire despues, ya que va a ir directo
+            ResultadoDijkstra RutaRobopuertoMasCercanoADestino = obtenerRobopuertoMasCercano(this.getNodo(destino));
+            double consumoDestinoARobopuertoMasCercano = RutaRobopuertoMasCercanoADestino.distancia * Robot.getFactorConsumo();
+            double bateriaQueQuedaAlLlegar = robot.getBateriaActual()-distanciaADestino*Robot.getFactorConsumo();
+            if ( consumoDestinoARobopuertoMasCercano > bateriaQueQuedaAlLlegar ) {
+                // CONSUMO DE DESTINO A ROBOPUERTO MAS CERCANO > BATERIA QUE ME QUEDA AL LLEGAR
+                debeRecargar = true; // obligo a que, aunque llegue directo, pare en el medio a recargar
+                System.out.println("Debe recargar en el medio, para no quedarse sin bateria luego");
+            }
+        }
+
+
         PriorityQueue<Estado> cola = new PriorityQueue<>(Comparator.comparingDouble(e -> e.distanciaTotal));
-        Map<Integer, Integer> mejorBateriaEnNodo = new HashMap<>();
+        Map<Integer, Double> mejorBateriaEnNodo = new HashMap<>();
 
         List<Object> caminoInicial = new ArrayList<>();
         caminoInicial.add(getNodo(origen));
 
+        double bateriaInicial = robot.getBateriaActual();
         cola.add(new Estado(origen, bateriaInicial, caminoInicial, 0));
-        System.out.println("🔄 Iniciando planificación desde nodo: " + getNodo(origen) + " hacia nodo: " + getNodo(destino));
+
+        System.out.println("🔄 Planificando desde nodo: " + getNodo(origen) + " hacia: " + getNodo(destino) + " con batería inicial: " + bateriaInicial);
 
         while (!cola.isEmpty()) {
             Estado actual = cola.poll();
@@ -456,17 +472,36 @@ public class Grafo {
             }
             mejorBateriaEnNodo.put(actual.nodo, actual.bateriaRestante);
 
+            if(esRobopuerto(actual.nodo) && actual.nodo != origen && debeRecargar) {
+                distanciaADestino = getDistancia(actual.nodo,destino);
+                ResultadoDijkstra RutaRobopuertoMasCercanoADestino = obtenerRobopuertoMasCercano(this.getNodo(destino));
+                double consumoDestinoARobopuertoMasCercano = RutaRobopuertoMasCercanoADestino.distancia * Robot.getFactorConsumo();
+                double bateriaQueQuedaAlLlegar = actual.bateriaRestante-distanciaADestino*Robot.getFactorConsumo();
+                if ( consumoDestinoARobopuertoMasCercano <= bateriaQueQuedaAlLlegar ) {
+                    // CONSUMO DE DESTINO A ROBOPUERTO MAS CERCANO > BATERIA QUE ME QUEDA AL LLEGAR
+                    debeRecargar = false; // si cargando en este robopuerto, me alcanza la bateria para despues, recargo aca
+
+                }
+
+
+            }
+
             if (actual.nodo == destino) {
+
+
+
                 System.out.println("✅ Se llegó al destino: " + getNodo(actual.nodo));
+
                 return new ResultadoDijkstra(getNodo(actual.nodo), actual.camino, actual.distanciaTotal);
             }
 
             for (int vecino = 0; vecino < matrizAdyacencia.length; vecino++) {
                 double distancia = getDistancia(actual.nodo, vecino);
                 if (distancia == Double.POSITIVE_INFINITY) continue;
+                if(vecino == origen || vecino == actual.nodo)continue;
 
-                int consumo = (int) Math.ceil(distancia * Robot.getFactorConsumo());
-                int nuevaBateria = actual.bateriaRestante - consumo;
+                double consumo = distancia * Robot.getFactorConsumo();
+                double nuevaBateria = actual.bateriaRestante - consumo;
 
                 System.out.print("➡️ Intentando ir a " + getNodo(vecino) + " (distancia: " + distancia + ", consumo: " + consumo + ")... ");
 
@@ -476,10 +511,16 @@ public class Grafo {
                 }
 
                 if (esRobopuerto(vecino)) {
-                    nuevaBateria = bateriaMaxima;
+                    nuevaBateria = Robot.getBateriaTotal();
                     System.out.println("⚡ Es robopuerto, recarga batería.");
-                } else {
+
+                }
+
+                else {
                     System.out.println("✔️ Llega sin recarga.");
+                }
+                if(debeRecargar && !esRobopuerto(vecino)) { // necesito recargar en el medio
+                    continue;
                 }
 
                 List<Object> nuevoCamino = new ArrayList<>(actual.camino);
@@ -491,6 +532,24 @@ public class Grafo {
 
         System.out.println("🚫 No se encontró una ruta viable desde " + getNodo(origen) + " hasta " + getNodo(destino));
         return null;
+    }
+
+    public void aplicarRuta(ResultadoDijkstra resultado, Robot robot) {
+        for (int i = 1; i < resultado.camino.size(); i++) {
+            Object desde = resultado.camino.get(i - 1);
+            Object hasta = resultado.camino.get(i);
+            int d = this.getIndice(desde);
+            int h = this.getIndice(hasta);
+
+            double distancia = this.getDistancia(d,h);
+            robot.consumirBateria(distancia);
+
+            if (this.esRobopuerto(h)) {
+                robot.recargar();
+            }
+
+            System.out.println("🔋 Robot viaja de " + desde + " a " + hasta + " (dist: " + distancia + "), batería: " + robot.getBateriaActual());
+        }
     }
 
 
