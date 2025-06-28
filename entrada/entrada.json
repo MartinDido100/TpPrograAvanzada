@@ -37,7 +37,18 @@
       "tipo": "PASIVO",
       "itemsOfrecidos":
       {
-        "Hierro" : 10,
+        "Hierro" : 5,
+        "Oro" : 10
+
+      }
+    },
+    { "posicionX": 5,
+      "posicionY": 8,
+      "id": 2,
+      "tipo": "ACTIVO",
+      "itemsOfrecidos":
+      {
+        "Hierro" : 5,
         "Oro" : 10
 
       }

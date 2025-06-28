@@ -112,10 +112,17 @@ public class EstacionRobot {
                     CofreProveedor proveedor = null;
                     int cantidadTotalUniverso = 0;
 
-                    for (CofreProveedor proveedores : this.cofresProveedores) {
-                        if (proveedores.getOfrecimientos().containsKey(itemSolicitado.getNombre())) {
-                            cantidadTotalUniverso += proveedores.getOfrecimientos().get(itemSolicitado.getNombre());
+                    ResultadoDijkstra robopuertoMasCercanoCamino = grafo.obtenerRobopuertoMasCercano(cofre);
+
+                    Robopuerto robopuertoMasCercano = (Robopuerto) robopuertoMasCercanoCamino.nodo;
+                    for (Cofre p : robopuertoMasCercano.getCofresIncluidos()) { // solo los que pueden llegar a llegar
+                        if(p instanceof CofreProveedor){
+                            CofreProveedor proveedores = (CofreProveedor) p;
+                            if (proveedores.getOfrecimientos().containsKey(itemSolicitado.getNombre())) {
+                                cantidadTotalUniverso += proveedores.getOfrecimientos().get(itemSolicitado.getNombre());
+                            }
                         }
+
                     }
                     if (itemSolicitado.getCantidad() > cantidadTotalUniverso) {
                         System.out.println("Se solicita " + itemSolicitado.getCantidad() + " y solo hay la siguiente cantidad en todo el universo: " + cantidadTotalUniverso);
@@ -308,7 +315,7 @@ public class EstacionRobot {
             }
             else if(cofre instanceof CofreAlmacenamiento){
                 ((CofreAlmacenamiento)cofre).almacenar(itemSolicitado);
-                proveedor.ofrecer(itemSolicitado.getNombre(), itemSolicitado.getCantidad()); // me saco toda la cantidad
+
             }
 
 
@@ -345,17 +352,26 @@ public class EstacionRobot {
     }
 
     public void chequearExcedentes(){
-        for(CofreProveedor prov : cofresProveedores) {
-            if (prov.getOfrecimientos().isEmpty()) // no tiene items sobrantes
+        for (CofreProveedor prov : cofresProveedores) {
+            if (prov.getOfrecimientos().isEmpty())
                 continue;
 
-            for (Map.Entry<String, Integer> I : prov.getOfrecimientos().entrySet()) {
-                Item itemExcedente = new Item(I.getKey(), I.getValue());
-                ResultadoDijkstra RutaACofreMasCercano = grafo.obtenerCofreExcedenteMasCercano(prov);
-                CofreAlmacenamiento CofreAlmacenadorMasCercano = (CofreAlmacenamiento) RutaACofreMasCercano.nodo;
-                realizarEntrega(CofreAlmacenadorMasCercano, itemExcedente, prov);
+            Iterator<Map.Entry<String, Integer>> it = prov.getOfrecimientos().entrySet().iterator();
 
+            while (it.hasNext()) {
+                Map.Entry<String, Integer> entry = it.next();
+                Item itemExcedente = new Item(entry.getKey(), entry.getValue());
 
+                ResultadoDijkstra ruta = grafo.obtenerCofreExcedenteMasCercano(prov);
+                CofreAlmacenamiento cofreDestino = (CofreAlmacenamiento) ruta.nodo;
+
+                realizarEntrega(cofreDestino, itemExcedente, prov);
+
+                int cantidad = prov.getOfrecimientos().getOrDefault(entry.getKey(), 0);
+
+                if (cantidad == 0) {
+                    it.remove();
+                }
             }
         }
 
