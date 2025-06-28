@@ -47,6 +47,6 @@ public class CofreBuffer extends Cofre implements CofreProveedor,CofreSolicitado
 
     @Override
     public void cumplirSolicitud(Item item) {
-        this.solicitudes.remove(item);
+        System.out.println("Se cumplio la solicitud del item " + item);
     }
 }

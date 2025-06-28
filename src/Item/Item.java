@@ -25,6 +25,12 @@ public class Item {
                     this.tipo = TipoItem.MATERIAL;
         }
     }
+    public Item(String nombre, int cantidad){
+        this.nombre = nombre;
+        this.cantidad = cantidad;
+        this.tipo = null;
+        this.id = -1;
+    }
 
     public int getCantidad() { return cantidad; }
 

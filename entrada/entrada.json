@@ -32,7 +32,8 @@
       "tipo": "PASIVO",
       "itemsOfrecidos":
       {
-        "Hierro" : 10
+        "Hierro" : 10,
+        "Oro" : 10
 
       }
     }

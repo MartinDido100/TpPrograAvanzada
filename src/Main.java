@@ -62,6 +62,7 @@ public class Main {
         estacion.getGrafo().mostrarMatriz();
         estacion.getGrafo().mostrarNodos();
         estacion.atenderPedidos();
+        estacion.chequearExcedentes();
 
 
     }

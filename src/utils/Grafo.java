@@ -1,9 +1,7 @@
 package utils;
 
 import Item.Item;
-import cofre.Cofre;
-import cofre.CofreProveedor;
-import cofre.CofreSolicitador;
+import cofre.*;
 import robopuerto.Robopuerto;
 import robot.Robot;
 
@@ -333,7 +331,76 @@ public class Grafo {
         return resul;
 
     }
+    public ResultadoDijkstra obtenerCofreExcedenteMasCercano(Object origen){
+        ResultadoDijkstra resul = null;
+        List<Object> caminoACofreMasCercano = new ArrayList<>();
+        int sucesores[] = new int[matrizAdyacencia.length]; // despues puedo reconstruir el camino
+        Cofre cofreMasCercano = null;
+        PriorityQueue<Arista> heap = new PriorityQueue<>();
+        double distancia[] = new double[matrizAdyacencia.length];
+        boolean visitados[] = new boolean[matrizAdyacencia.length];
+        int o = nodos.indexOf(origen); // obtengo su posicion en la matriz de
 
+        for(int i=0; i< matrizAdyacencia.length; i++) { // agrego todas las aristas del robopuerto actual
+            heap.add(new Arista(o,i,matrizAdyacencia[o][i]));
+            distancia[i] = matrizAdyacencia[o][i];
+            visitados[i] = false;
+            sucesores[i] = o;
+        }
+
+
+        while(!heap.isEmpty()) {
+            Arista masCercano = heap.poll();
+            int u = masCercano.destino;
+            if(visitados[u]) continue;
+            visitados[u] = true;
+
+            for(int v=0; v<matrizAdyacencia.length; v++) {
+                if(u == v)continue;
+
+                if(!visitados[v] && (distancia[v] > (distancia[u]+matrizAdyacencia[u][v]))){
+                    distancia[v] = distancia[u]+matrizAdyacencia[u][v]; // si me conviene pasar por u
+                    sucesores[v] = u; // para ir a v, paso por u
+                    heap.add(new Arista(u,v,distancia[v]));
+                    // distancia[v] es distancia de cofre a V, distancia[u] es distancia de cofre a donde estoy parado ahora
+                    //distancia[u]+matrizAdyacencia[u][v] es distancia a U + distancia de U a V, osea veo si conviene pasar por u para ir a v
+                }
+
+            }
+        }
+
+        double menorDistancia = Double.MAX_VALUE;
+        int indiceCofre = -1;
+
+        for (int i = this.cantidadRobopuertos; i < this.cantidadRobopuertos+this.cantidadCofres; i++) { // busco el cofre con el item solicitado mas cercano
+            cofreMasCercano = (Cofre) nodos.get(i);
+            if (distancia[i-cantidadRobopuertos] < menorDistancia && cofreMasCercano instanceof CofreAlmacenamiento) { // TODO: agregar atributo "tipo" a Cofre, para sacar el instanceof
+                menorDistancia = distancia[i-cantidadRobopuertos];
+                indiceCofre = i;
+            }
+        }
+
+        cofreMasCercano = (Cofre) nodos.get(indiceCofre);
+
+
+
+        if(cofreMasCercano != null){
+            int actual = indiceCofre;
+            caminoACofreMasCercano.addFirst(nodos.get(actual));
+
+            while (sucesores[actual] != o) {
+                actual = sucesores[actual];
+                caminoACofreMasCercano.addFirst(nodos.get(actual));
+            }
+
+            caminoACofreMasCercano.addFirst(origen); // El robopuerto
+            resul = new ResultadoDijkstra(cofreMasCercano,caminoACofreMasCercano, menorDistancia);
+        }
+
+
+
+        return resul;
+    }
     public ResultadoDijkstra obtenerRobopuertoMasCercano(Object origen) {
         ResultadoDijkstra resul = null;
         List<Object> caminoARobopuertoMasCercano = new ArrayList<>();
