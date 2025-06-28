@@ -108,7 +108,6 @@ public class EstacionRobot {
             if(robopuertoMasCercanoCamino == null){
                 System.out.println("El cofre no tiene a ningun robopuerto en cobertura, no se puede completar el pedido");
                 return;
-
             }
 
             while(!cofre.getSolicitudes().isEmpty()){ // mientras quede pedidos
