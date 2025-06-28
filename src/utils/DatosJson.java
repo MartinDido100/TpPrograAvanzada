@@ -9,6 +9,8 @@ public class DatosJson {
     private List<Robot> robots;
     private List<Cofre> cofres;
     private List<Item> items;
+    private double bateriaRobots;
+    private double factorConsumo;
 
     public Mapa getMapa() {
         return mapa;
@@ -40,6 +42,22 @@ public class DatosJson {
 
     public void setItems(List<Item> items) {
         this.items = items;
+    }
+
+    public double getBateriaRobots() {
+        return bateriaRobots;
+    }
+
+    public void setBateriaRobots(double bateriaRobots) {
+        this.bateriaRobots = bateriaRobots;
+    }
+
+    public double getFactorConsumo() {
+        return factorConsumo;
+    }
+
+    public void setFactorConsumo(double factorConsumo) {
+        this.factorConsumo = factorConsumo;
     }
 
     public static class Mapa {

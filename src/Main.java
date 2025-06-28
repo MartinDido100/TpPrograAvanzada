@@ -28,7 +28,7 @@ public class Main {
         ).toList();
 
         List<Robot> robots = data.getRobots().stream().map(
-                robot -> new Robot(robot.getId(),robot.getPosicionX(),robot.getPosicionY())
+                robot -> new Robot(robot.getId(),robot.getPosicionX(),robot.getPosicionY(),data.getBateriaRobots(),data.getFactorConsumo())
         ).toList();
 
         EstacionRobot estacion = new EstacionRobot(new Mapa(data.getMapa().getCasilleros()),robopuertos, robots);
