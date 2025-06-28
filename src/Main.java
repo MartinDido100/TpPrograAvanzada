@@ -43,7 +43,7 @@ public class Main {
                             estacion.addCofrePasivo(new CofreProvisionPasiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(),cofre.getItemsOfrecidos()));
                         }
                         case BUFER -> {
-                            estacion.addRequestChest(new CofreBuffer(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
+                            estacion.addRequestChest(new CofreBuffer(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(),cofre.getItemsOfrecidos(),cofre.getSolicitudes()));
                         }
                         case ALMACENAMIENTO -> {
                             estacion.addCofreAlmacenamiento(new CofreAlmacenamiento(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));

@@ -100,22 +100,16 @@ public class EstacionRobot {
         for (CofreSolicitador cofre : this.pedidos) {
             for(Item itemSolicitado : cofre.getSolicitudes()){
                 boolean cumplido = false;
-                for(CofreProvisionActiva proveedor : this.cofresActivos){
+                CofreProveedor proveedor = null;
+
+                for(CofreProvisionActiva prov : this.cofresActivos){
                     // chequeo si hay algun cofre activo que tenga el item, para la prioridad
-                    if(proveedor.getOfrecimientos().containsKey(itemSolicitado.getNombre())){
-                        int cantidadProveedor = proveedor.getOfrecimientos().get(itemSolicitado.getNombre());
-                        if(cantidadProveedor >= itemSolicitado.getCantidad()){
-                            proveedor.ofrecer(itemSolicitado.getNombre(), itemSolicitado.getCantidad());
-                            cofre.cumplirSolicitud(itemSolicitado);
-                            cumplido = true;
-                            break;
-                        }
+                    if(prov.getOfrecimientos().containsKey(itemSolicitado.getNombre())){
+                        proveedor = prov;
                     }
+                    if(proveedor != null)break;
                 }
-                if(cumplido){
-                    continue;
-                }
-                ResultadoDijkstra rutaCofreARobot = this.grafo.obtenerRobopuertoConRobotMasCercano((Cofre)cofre); // me devuelve el robopuerto con robot disponible mas cercano
+               ResultadoDijkstra rutaCofreARobot = this.grafo.obtenerRobopuertoConRobotMasCercano((Cofre)cofre); // me devuelve el robopuerto con robot disponible mas cercano
 
                 if(rutaCofreARobot != null){ // si no hay robot disponible, no puedo cumplir con el pedido
                     Robopuerto robopuertoConRobotMasCercano = (Robopuerto)rutaCofreARobot.nodo;
@@ -129,9 +123,11 @@ public class EstacionRobot {
 
 
 
+                    if(proveedor == null){ // si no hubo proveedor activo, busco uno pasivo
+                        ResultadoDijkstra rutaACofreProveedor = this.grafo.obtenerCofreConObjetoMasCercano(robopuertoConRobotMasCercano,itemSolicitado); // robopuerto a proveecdor
+                        proveedor = (CofreProveedor) rutaACofreProveedor.nodo;
+                    }
 
-                    ResultadoDijkstra rutaACofreProveedor = this.grafo.obtenerCofreConObjetoMasCercano(robopuertoConRobotMasCercano,itemSolicitado); // robopuerto a proveecdor
-                    CofreProveedor proveedor = (CofreProveedor) rutaACofreProveedor.nodo;
                     ResultadoDijkstra rutaARobopuertoMasCercano = this.grafo.obtenerRobopuertoMasCercano(cofre); // solicitante a robopuerto
                     Robopuerto robopuertoMasCercano = (Robopuerto)rutaARobopuertoMasCercano.nodo;
 

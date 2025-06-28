@@ -1,6 +1,7 @@
 package cofre;
 
 import Item.Item;
+import utils.DatosJson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,11 +11,15 @@ import java.util.Map;
 public class CofreBuffer extends Cofre implements CofreProveedor,CofreSolicitador{
     protected Map<String,Integer> itemsOfrecidos;
     protected List<Item> solicitudes;
-    public CofreBuffer(int posicionX, int posicionY, int id) {
+    public CofreBuffer(int posicionX, int posicionY, int id, Map<String,Integer> itemsOfrecidos, List<DatosJson.Item> solicitudes) {
 
         super(posicionX, posicionY, id);
-        itemsOfrecidos = new HashMap<String,Integer>();
-        solicitudes = new ArrayList<Item>();
+        this.itemsOfrecidos = itemsOfrecidos;
+        this.solicitudes = new ArrayList<>();
+
+        for(DatosJson.Item item : solicitudes){
+            this.solicitudes.add(new Item(item.getId(),item.getNombre(), item.getTipo(),item.getCantidad()));
+        }
     }
 
 
