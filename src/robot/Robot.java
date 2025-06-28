@@ -9,16 +9,22 @@ public class Robot {
     private int id;
     private int posicionX;
     private int posicionY;
-    private static final double BATERIA_TOTAL = 10; //cantidad de celulas
+    private static double BATERIA_TOTAL = 10; //cantidad de celulas
     private double bateriaActual;
-    private static final double FACTOR_CONSUMO = 1.5; //consumo de celulas
+    private static double FACTOR_CONSUMO = 1.5; //consumo de celulas
     List<Item> items;
 
-    public Robot(int id, int posicionX, int posicionY) {
+    public Robot(int id, int posicionX, int posicionY, double bateriaTotal, double factorConsumo) {
         this.items = new ArrayList<Item>();
         this.id = id;
         this.posicionX = posicionX;
         this.posicionY = posicionY;
+        if (bateriaTotal > 0) {
+            BATERIA_TOTAL = bateriaTotal;
+        }
+        if (factorConsumo > 0) {
+            FACTOR_CONSUMO = factorConsumo;
+        }
         bateriaActual = BATERIA_TOTAL;
     }
 
