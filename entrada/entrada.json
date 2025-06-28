@@ -26,6 +26,11 @@
       }
 
     },
+    { "posicionX": 7,
+      "posicionY": 7,
+      "id": 3,
+      "tipo": "ALMACENAMIENTO"
+    },
     { "posicionX": 11,
       "posicionY": 11,
       "id": 2,

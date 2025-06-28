@@ -17,6 +17,7 @@ public class EstacionRobot {
     List<CofreAlmacenamiento> cofresAlmacenamiento;
     List<CofreSolicitador> pedidos;
     List<Cofre>cofres;
+    List<CofreProveedor> cofresProveedores;
     Grafo grafo;
 
     public EstacionRobot(Mapa mapa, List<Robopuerto> robopuertos, List<Robot> robots) {
@@ -28,6 +29,7 @@ public class EstacionRobot {
         this.cofresPasivos = new ArrayList<>();
         this.cofresAlmacenamiento = new ArrayList<>();
         this.cofres = new ArrayList<>();
+        this.cofresProveedores = new ArrayList<>();
     }
 
     public void mostrarVecinos() { //DEBUG
@@ -44,9 +46,14 @@ public class EstacionRobot {
         cofres.addAll(cofresPasivos);
         cofres.addAll(cofresActivos);
         cofres.addAll(cofresAlmacenamiento);
+        cofresProveedores.addAll(cofresActivos);
+        cofresProveedores.addAll(cofresPasivos);
 
         for(CofreSolicitador c : pedidos){ // no se puede castear la lista entera
             cofres.add((Cofre)c);
+            if(c instanceof CofreBuffer){
+                cofresProveedores.add((CofreBuffer)c);
+            }
         }
         this.cofres = cofres;
         this.cargarMapa();
@@ -210,7 +217,7 @@ public class EstacionRobot {
     }
 
     public boolean realizarEntrega(Cofre cofre, Item itemSolicitado, CofreProveedor proveedor){
-        ResultadoDijkstra rutaCofreARobot = this.grafo.obtenerRobopuertoConRobotMasCercano((Cofre)cofre); // me devuelve el robopuerto con robot disponible mas cercano
+        ResultadoDijkstra rutaCofreARobot = this.grafo.obtenerRobopuertoConRobotMasCercano(cofre); // me devuelve el robopuerto con robot disponible mas cercano
 
         if(rutaCofreARobot != null){ // si no hay robot disponible, no puedo cumplir con el pedido
             Robopuerto robopuertoConRobotMasCercano = (Robopuerto)rutaCofreARobot.nodo;
@@ -300,12 +307,15 @@ public class EstacionRobot {
 
             System.out.println("Tramo 3 (a recarga final):");
             tramo3.camino.forEach(System.out::println);
+
+            Robopuerto robopuertoFinal = (Robopuerto) tramo3.nodo;
+            robopuertoFinal.getRobotsActuales().add(robot);
         }
         return true;
     }
 
     public void chequearExcedentes(){
-        for(CofreProvisionActiva prov : cofresActivos) {
+        for(CofreProveedor prov : cofresProveedores) {
             if (prov.getOfrecimientos().isEmpty()) // no tiene items sobrantes
                 continue;
 
@@ -318,19 +328,6 @@ public class EstacionRobot {
 
             }
         }
-        for(CofreProvisionPasiva prov : cofresPasivos){
-            if(prov.getOfrecimientos().isEmpty()) // no tiene items sobrantes
-                continue;
 
-            for(Map.Entry<String, Integer> I : prov.getOfrecimientos().entrySet()){
-                Item itemExcedente = new Item(I.getKey(),I.getValue());
-                ResultadoDijkstra RutaACofreMasCercano = grafo.obtenerCofreExcedenteMasCercano(prov);
-                CofreAlmacenamiento CofreAlmacenadorMasCercano = (CofreAlmacenamiento) RutaACofreMasCercano.nodo;
-                realizarEntrega(CofreAlmacenadorMasCercano,itemExcedente,prov);
-
-
-            }
-
-        }
     }
 }
