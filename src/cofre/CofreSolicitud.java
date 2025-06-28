@@ -29,7 +29,6 @@ public class CofreSolicitud extends Cofre implements CofreSolicitador{
     @Override
     public void cumplirSolicitud(Item item) {
         System.out.println("Se cumplio la solicitud del item " + item);
-
     }
 
     public List<Item> getSolicitudes(){

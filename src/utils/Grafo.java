@@ -1,7 +1,10 @@
 package utils;
 
 import Item.Item;
-import cofre.*;
+import cofre.Cofre;
+import cofre.CofreAlmacenamiento;
+import cofre.CofreProveedor;
+import cofre.CofreSolicitador;
 import robopuerto.Robopuerto;
 import robot.Robot;
 
@@ -247,7 +250,7 @@ public class Grafo {
         for (int i = this.cantidadRobopuertos; i < this.cantidadRobopuertos+this.cantidadCofres; i++) { // busco el cofre con el item solicitado mas cercano
             cofreMasCercano = (Cofre) nodos.get(i);
             if (distancia[i-cantidadRobopuertos] < menorDistancia && cofreMasCercano instanceof CofreProveedor &&
-                    (((CofreProveedor) cofreMasCercano).getOfrecimientos().get(itemSolicitado.getNombre())) >= itemSolicitado.getCantidad() ) { // TODO: agregar atributo "tipo" a Cofre, para sacar el instanceof
+                    (((CofreProveedor) cofreMasCercano).getOfrecimientos().containsKey(itemSolicitado.getNombre())) ) { // TODO: agregar atributo "tipo" a Cofre, para sacar el instanceof
                 menorDistancia = distancia[i-cantidadRobopuertos];
                 indiceCofre = i;
             }

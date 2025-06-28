@@ -35,4 +35,6 @@ public class Item {
     public int getCantidad() { return cantidad; }
 
     public String getNombre() { return nombre; }
+
+    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
 }

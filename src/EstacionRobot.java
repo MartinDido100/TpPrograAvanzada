@@ -103,27 +103,43 @@ public class EstacionRobot {
 
     public void atenderPedidos(){
         for (CofreSolicitador cofre : this.pedidos) {
-            Iterator<Item> it = cofre.getSolicitudes().iterator();
+            while(!cofre.getSolicitudes().isEmpty()){ // mientras quede pedidos
+                Iterator<Item> it = cofre.getSolicitudes().iterator();
 
-            while (it.hasNext()) {
-                Item itemSolicitado = it.next();
+                while (it.hasNext()) {
+                    Item itemSolicitado = it.next();
 
-                CofreProveedor proveedor = null;
+                    CofreProveedor proveedor = null;
+                    int cantidadTotalUniverso = 0;
 
-                for (CofreProvisionActiva prov : this.cofresActivos) {
-                    if (prov.getOfrecimientos().containsKey(itemSolicitado.getNombre())) {
-                        proveedor = prov;
+                    for (CofreProveedor proveedores : this.cofresProveedores) {
+                        if (proveedores.getOfrecimientos().containsKey(itemSolicitado.getNombre())) {
+                            cantidadTotalUniverso += proveedores.getOfrecimientos().get(itemSolicitado.getNombre());
+                        }
                     }
-                    if (proveedor != null)
-                        break;
-                }
+                    if (itemSolicitado.getCantidad() > cantidadTotalUniverso) {
+                        System.out.println("Se solicita " + itemSolicitado.getCantidad() + " y solo hay la siguiente cantidad en todo el universo: " + cantidadTotalUniverso);
+                        it.remove();
+                        continue;
+                    }
+                    for (CofreProvisionActiva prov : this.cofresActivos) { // prioridad
+                        if (prov.getOfrecimientos().containsKey(itemSolicitado.getNombre())) {
+                            proveedor = prov;
+                        }
+                        if (proveedor != null)
+                            break;
+                    }
 
-                boolean entregado = realizarEntrega((Cofre) cofre, itemSolicitado, proveedor);
+                    boolean completado = realizarEntrega((Cofre) cofre, itemSolicitado, proveedor);
 
-                if (entregado) {
-                    it.remove(); // ✅ Elimina del iterador de forma segura
+                    if (completado) {
+                        it.remove(); // lo saco de solicitudes porque ya se entrego toda la cantidad
+                    }
                 }
             }
+
+
+
         }
     }
 
@@ -218,7 +234,7 @@ public class EstacionRobot {
 
     public boolean realizarEntrega(Cofre cofre, Item itemSolicitado, CofreProveedor proveedor){
         ResultadoDijkstra rutaCofreARobot = this.grafo.obtenerRobopuertoConRobotMasCercano(cofre); // me devuelve el robopuerto con robot disponible mas cercano
-
+        boolean completado = false; // si no complete totalmente el pedido, no lo saco de la lista
         if(rutaCofreARobot != null){ // si no hay robot disponible, no puedo cumplir con el pedido
             Robopuerto robopuertoConRobotMasCercano = (Robopuerto)rutaCofreARobot.nodo;
             Robot robot = robopuertoConRobotMasCercano.getRobotsActuales().removeFirst();
@@ -257,9 +273,12 @@ public class EstacionRobot {
             }
 
             grafo.aplicarRuta(tramo1,robot); // aplicar ruta lo que hace es consumir la bateria real del robot, y decir que ruta tomo hasta el objetivo
+            int cantidadParaOfrecer = proveedor.getOfrecimientos().get(itemSolicitado.getNombre());
 
-            proveedor.ofrecer(itemSolicitado.getNombre(), itemSolicitado.getCantidad());
-            robot.getItems().add(itemSolicitado);
+
+
+
+
 
             // Paso 2: del cofre proveedor al cofre solicitador (con batería llena)
             ResultadoDijkstra tramo2 = grafo.planificarRutaConRecargas(
@@ -276,11 +295,22 @@ public class EstacionRobot {
             grafo.aplicarRuta(tramo2,robot);
             if(cofre instanceof CofreSolicitador){
                 ((CofreSolicitador)cofre).cumplirSolicitud(itemSolicitado);
+                if(cantidadParaOfrecer >= itemSolicitado.getCantidad()){
+                    proveedor.ofrecer(itemSolicitado.getNombre(), itemSolicitado.getCantidad());
+                    itemSolicitado.setCantidad(0);
+                    completado = true; // si devuelvo true, saca el pedido de la lista
+                }
+                else
+                {
+                    proveedor.ofrecer(itemSolicitado.getNombre(), cantidadParaOfrecer); // doy todooo
+                    itemSolicitado.setCantidad(itemSolicitado.getCantidad()-cantidadParaOfrecer); // no se cumplio todo
+                }
             }
             else if(cofre instanceof CofreAlmacenamiento){
                 ((CofreAlmacenamiento)cofre).almacenar(itemSolicitado);
+                proveedor.ofrecer(itemSolicitado.getNombre(), itemSolicitado.getCantidad()); // me saco toda la cantidad
             }
-            robot.getItems().remove(itemSolicitado);
+
 
             // Paso 3: del cofre solicitador al robopuerto más cercano (para que el robot recargue)
             ResultadoDijkstra tramo3 = grafo.planificarRutaConRecargas(
@@ -311,7 +341,7 @@ public class EstacionRobot {
             Robopuerto robopuertoFinal = (Robopuerto) tramo3.nodo;
             robopuertoFinal.getRobotsActuales().add(robot);
         }
-        return true;
+        return completado;
     }
 
     public void chequearExcedentes(){
