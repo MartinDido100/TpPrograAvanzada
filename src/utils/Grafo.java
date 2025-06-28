@@ -382,7 +382,7 @@ public class Grafo {
                 indiceCofre = i;
             }
         }
-
+        if(indiceCofre == -1)return null;
         cofreMasCercano = (Cofre) nodos.get(indiceCofre);
 
 
@@ -452,7 +452,7 @@ public class Grafo {
                 indiceRobopuerto = i;
             }
         }
-
+        if(indiceRobopuerto == -1)return null;
         robopuertoMasCercano = (Robopuerto)nodos.get(indiceRobopuerto);
 
 

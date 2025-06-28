@@ -103,8 +103,19 @@ public class EstacionRobot {
 
     public void atenderPedidos(){
         for (CofreSolicitador cofre : this.pedidos) {
+
+            ResultadoDijkstra robopuertoMasCercanoCamino = grafo.obtenerRobopuertoMasCercano(cofre);
+            if(robopuertoMasCercanoCamino == null){
+                System.out.println("El cofre no tiene a ningun robopuerto en cobertura, no se puede completar el pedido");
+                return;
+
+            }
+
             while(!cofre.getSolicitudes().isEmpty()){ // mientras quede pedidos
                 Iterator<Item> it = cofre.getSolicitudes().iterator();
+
+
+                Robopuerto robopuertoMasCercano = (Robopuerto) robopuertoMasCercanoCamino.nodo;
 
                 while (it.hasNext()) {
                     Item itemSolicitado = it.next();
@@ -112,9 +123,7 @@ public class EstacionRobot {
                     CofreProveedor proveedor = null;
                     int cantidadTotalUniverso = 0;
 
-                    ResultadoDijkstra robopuertoMasCercanoCamino = grafo.obtenerRobopuertoMasCercano(cofre);
 
-                    Robopuerto robopuertoMasCercano = (Robopuerto) robopuertoMasCercanoCamino.nodo;
                     for (Cofre p : robopuertoMasCercano.getCofresIncluidos()) { // solo los que pueden llegar a llegar
                         if(p instanceof CofreProveedor){
                             CofreProveedor proveedores = (CofreProveedor) p;
@@ -355,6 +364,8 @@ public class EstacionRobot {
         for (CofreProveedor prov : cofresProveedores) {
             if (prov.getOfrecimientos().isEmpty())
                 continue;
+            ResultadoDijkstra ruta = grafo.obtenerCofreExcedenteMasCercano(prov);
+            if(ruta == null)continue;
 
             Iterator<Map.Entry<String, Integer>> it = prov.getOfrecimientos().entrySet().iterator();
 
@@ -362,7 +373,8 @@ public class EstacionRobot {
                 Map.Entry<String, Integer> entry = it.next();
                 Item itemExcedente = new Item(entry.getKey(), entry.getValue());
 
-                ResultadoDijkstra ruta = grafo.obtenerCofreExcedenteMasCercano(prov);
+
+
                 CofreAlmacenamiento cofreDestino = (CofreAlmacenamiento) ruta.nodo;
 
                 realizarEntrega(cofreDestino, itemExcedente, prov);
