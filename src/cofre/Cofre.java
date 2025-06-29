@@ -4,6 +4,7 @@ public abstract class Cofre {
     protected int posicionX;
     protected int posicionY;
     protected int id;
+    protected TipoCofre tipo;
 
     public Cofre(int posicionX, int posicionY, int id) {
         this.posicionX = posicionX;
@@ -21,5 +22,11 @@ public abstract class Cofre {
 
     public int getId() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return "Cofre: " + tipo + " con ID " + id ;
+
     }
 }

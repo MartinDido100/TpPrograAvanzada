@@ -7,13 +7,58 @@
     "casilleros": 20
   },
   "cofres": [
-    { "posicionX": 7, "posicionY": 8, "id": 1, "tipo": "SOLICITUD" },
-    { "posicionX": 11, "posicionY": 11, "id": 2, "tipo": "PASIVO" }
+    { "posicionX": 7,
+      "posicionY": 8,
+      "id": 1,
+      "tipo": "BUFER",
+      "solicitudes":
+      [
+        {
+          "id": 1,
+          "nombre": "Hierro",
+          "tipo": "MATERIAL",
+          "cantidad": 10
+        }
+      ],
+      "itemsOfrecidos":
+      {
+        "Oro" : 10
+      }
+
+    },
+    { "posicionX": 7,
+      "posicionY": 7,
+      "id": 3,
+      "tipo": "ALMACENAMIENTO"
+    },
+    { "posicionX": 11,
+      "posicionY": 11,
+      "id": 2,
+      "tipo": "PASIVO",
+      "itemsOfrecidos":
+      {
+        "Hierro" : 5,
+        "Oro" : 10
+
+      }
+    },
+    { "posicionX": 5,
+      "posicionY": 8,
+      "id": 2,
+      "tipo": "ACTIVO",
+      "itemsOfrecidos":
+      {
+        "Hierro" : 5,
+        "Oro" : 10
+      }
+    }
   ],
   "robots": [
     { "id": 1, "posicionX": 5, "posicionY": 6 },
     { "id": 2, "posicionX": 9, "posicionY": 10 }
   ],
+  "bateriaRobots": 10,
+  "factorConsumo": 1.5,
   "items": [
     { "id": 1, "nombre": "Hierro", "tipo": "MATERIAL" },
     { "id": 2, "nombre": "Circuitos", "tipo": "COMPONENTE" },

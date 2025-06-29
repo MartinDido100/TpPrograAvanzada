@@ -6,19 +6,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Robot {
-    private int id;
-    private int posicionX;
-    private int posicionY;
-    private static final int BATERIA_TOTAL = 100; //cantidad de celulas
-    private int bateriaActual;
-    private static final int FACTOR_CONSUMO = 1; //consumo de celulas
+    private final int id;
+    private final int posicionX;
+    private final int posicionY;
+    private static double BATERIA_TOTAL = 10; //cantidad de celulas
+    private double bateriaActual;
+    private static double FACTOR_CONSUMO = 1.5; //consumo de celulas
     List<Item> items;
 
-    public Robot(int id, int posicionX, int posicionY) {
+    public Robot(int id, int posicionX, int posicionY, double bateriaTotal, double factorConsumo) {
         this.items = new ArrayList<Item>();
         this.id = id;
         this.posicionX = posicionX;
         this.posicionY = posicionY;
+        if (bateriaTotal > 0) {
+            BATERIA_TOTAL = bateriaTotal;
+        }
+        if (factorConsumo > 0) {
+            FACTOR_CONSUMO = factorConsumo;
+        }
         bateriaActual = BATERIA_TOTAL;
     }
 
@@ -33,18 +39,32 @@ public class Robot {
     public int getPosicionY() {
         return posicionY;
     }
-    public int getBateriaActual() {
+    public double getBateriaActual() {
         return bateriaActual;
-    }
-    public List<Item> getItems() {
-        return items;
     }
 
     public void recargar(){
         bateriaActual = BATERIA_TOTAL;
     }
     public void consumirBateria(double distancia){
-        bateriaActual-= (int) distancia*FACTOR_CONSUMO;
+        bateriaActual-=  distancia*FACTOR_CONSUMO;
 
+    }
+
+    public boolean alcanzaBateria(double distancia){
+        return bateriaActual >= distancia*FACTOR_CONSUMO;
+    }
+
+    public static double getFactorConsumo(){
+        return FACTOR_CONSUMO;
+    }
+
+    public static double getBateriaTotal(){
+        return BATERIA_TOTAL;
+    }
+
+    @Override
+    public String toString() {
+        return "Robot con id " + id;
     }
 }

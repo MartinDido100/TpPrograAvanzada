@@ -5,12 +5,12 @@ import robot.Robot;
 import java.util.List;
 
 public class ResultadoDijkstra {
-    public Robot robot;
+    public Object nodo;
     public List<Object> camino;
     public double distancia;
 
-    public ResultadoDijkstra(Robot robot, List<Object> camino, double distancia) {
-        this.robot = robot;
+    public ResultadoDijkstra(Object nodo, List<Object> camino, double distancia) {
+        this.nodo = nodo;
         this.camino = camino;
         this.distancia = distancia;
     }
