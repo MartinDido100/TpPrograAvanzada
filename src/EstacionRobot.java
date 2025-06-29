@@ -32,15 +32,6 @@ public class EstacionRobot {
         this.cofresProveedores = new ArrayList<>();
     }
 
-    public void mostrarVecinos() { //DEBUG
-        for (Robopuerto robopuerto : this.robopuertos) {
-            System.out.println("Robopuerto " + robopuerto.getId() + " tiene los siguientes robopuertos vecinos:");
-            for (Robopuerto vecino : robopuerto.getRobopuertosVecinos()) {
-                System.out.println("Robopuerto " + vecino.getId());
-            }
-        }
-    }
-
     public void setup(){
         List<Cofre> cofres = new ArrayList<>();
         cofres.addAll(cofresPasivos);
@@ -67,9 +58,6 @@ public class EstacionRobot {
         }
 
         this.calcularRobopuertosVecinos();
-        for (Robopuerto robopuerto : this.robopuertos) {
-            System.out.println(robopuerto.getRobopuertosVecinos());
-        }
         this.grafo = new Grafo(new ArrayList<>(robopuertos),new ArrayList<>(cofres));
     }
 
@@ -114,7 +102,6 @@ public class EstacionRobot {
             while(!cofre.getSolicitudes().isEmpty()){ // mientras quede pedidos
                 Iterator<Item> it = cofre.getSolicitudes().iterator();
 
-
                 Robopuerto robopuertoMasCercano = (Robopuerto) robopuertoMasCercanoCamino.nodo;
 
                 while (it.hasNext()) {
@@ -125,8 +112,7 @@ public class EstacionRobot {
 
 
                     for (Cofre p : robopuertoMasCercano.getCofresIncluidos()) { // solo los que pueden llegar a llegar
-                        if(p instanceof CofreProveedor){
-                            CofreProveedor proveedores = (CofreProveedor) p;
+                        if(p instanceof CofreProveedor proveedores){
                             if (proveedores.getOfrecimientos().containsKey(itemSolicitado.getNombre())) {
                                 cantidadTotalUniverso += proveedores.getOfrecimientos().get(itemSolicitado.getNombre());
                             }
@@ -153,9 +139,6 @@ public class EstacionRobot {
                     }
                 }
             }
-
-
-
         }
     }
 
@@ -255,14 +238,6 @@ public class EstacionRobot {
             Robopuerto robopuertoConRobotMasCercano = (Robopuerto)rutaCofreARobot.nodo;
             Robot robot = robopuertoConRobotMasCercano.getRobotsActuales().removeFirst();
 
-            System.out.println(rutaCofreARobot.distancia);
-            System.out.println(rutaCofreARobot.camino);
-            System.out.println(robot.getId());
-            System.out.println(robot.getPosicionX());
-            System.out.println(robot.getPosicionY());
-
-
-
             if(proveedor == null){ // si no hubo proveedor activo, busco uno pasivo
                 ResultadoDijkstra rutaACofreProveedor = this.grafo.obtenerCofreConObjetoMasCercano(robopuertoConRobotMasCercano,itemSolicitado); // robopuerto a proveecdor
                 proveedor = (CofreProveedor) rutaACofreProveedor.nodo;
@@ -290,11 +265,6 @@ public class EstacionRobot {
 
             grafo.aplicarRuta(tramo1,robot); // aplicar ruta lo que hace es consumir la bateria real del robot, y decir que ruta tomo hasta el objetivo
             int cantidadParaOfrecer = proveedor.getOfrecimientos().get(itemSolicitado.getNombre());
-
-
-
-
-
 
             // Paso 2: del cofre proveedor al cofre solicitador (con batería llena)
             ResultadoDijkstra tramo2 = grafo.planificarRutaConRecargas(
@@ -327,14 +297,12 @@ public class EstacionRobot {
 
             }
 
-
             // Paso 3: del cofre solicitador al robopuerto más cercano (para que el robot recargue)
             ResultadoDijkstra tramo3 = grafo.planificarRutaConRecargas(
                     indiceCofreSolicitador,
                     indiceRobopuertoMasCercano,
                     robot
             );
-
 
             if (tramo3 == null) {
                 System.out.println("No se puede regresar a ningún robopuerto después de entregar.");
@@ -387,5 +355,19 @@ public class EstacionRobot {
             }
         }
 
+    }
+
+    public void mostrarAlmacenamiento(){
+        System.out.println("\n\nAlmacenamiento de los cofres:\n");
+        for (CofreAlmacenamiento cofre : this.cofresAlmacenamiento) {
+            System.out.println("Cofre ID: " + cofre.getId() + " en posición (" + cofre.getPosicionX() + ", " + cofre.getPosicionY() + ")");
+            if (cofre.getAlmacenamiento().isEmpty()) {
+                System.out.println("  - No hay items almacenados.");
+            } else {
+                for (Item item : cofre.getAlmacenamiento()) {
+                    System.out.println("  - " + item);
+                }
+            }
+        }
     }
 }

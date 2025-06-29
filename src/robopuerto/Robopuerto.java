@@ -6,13 +6,13 @@ import robot.Robot;
 import java.util.ArrayList;
 
 public class Robopuerto {
-    private int posicionX;
-    private int posicionY;
+    private final int posicionX;
+    private final int posicionY;
     private static final int alcance = 3;
-    private int id;
-    private ArrayList<Robopuerto> robopuertosVecinos;
-    private ArrayList<Cofre> cofresIncluidos;
-    private ArrayList<Robot> robotsActuales;
+    private final int id;
+    private final ArrayList<Robopuerto> robopuertosVecinos;
+    private final ArrayList<Cofre> cofresIncluidos;
+    private final ArrayList<Robot> robotsActuales;
 
     public Robopuerto(int posicionX, int posicionY, int id) {
         this.posicionX = posicionX;
@@ -55,5 +55,10 @@ public class Robopuerto {
 
     public void addCofreIncluido(Cofre cofre) {
         this.cofresIncluidos.add(cofre);
+    }
+
+    @Override
+    public String toString() {
+        return "Robopuerto: " + id;
     }
 }

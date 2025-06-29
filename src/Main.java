@@ -4,11 +4,9 @@ import robopuerto.Robopuerto;
 import robot.Robot;
 import utils.DatosJson;
 import utils.FileReader;
-import utils.Grafo;
 
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Main {
     public static final String ROBOT_EMOJI = "🤖";
@@ -57,13 +55,11 @@ public class Main {
         );
 
         estacion.setup();
-
         estacion.getMapa().mostrarMapaConContorno(estacion.getRobopuertos(),estacion.getCofres());
-        estacion.getGrafo().mostrarMatriz();
-        estacion.getGrafo().mostrarNodos();
         estacion.atenderPedidos();
+
+        System.out.println("\n\nChequeando excedentes de los cofres...\n\n");
         estacion.chequearExcedentes();
-
-
+        estacion.mostrarAlmacenamiento();
     }
 }

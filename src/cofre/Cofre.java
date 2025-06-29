@@ -1,20 +1,15 @@
 package cofre;
 
-import Item.Item;
-
-import java.util.HashMap;
-import java.util.Map;
-
 public abstract class Cofre {
     protected int posicionX;
     protected int posicionY;
     protected int id;
+    protected TipoCofre tipo;
 
     public Cofre(int posicionX, int posicionY, int id) {
         this.posicionX = posicionX;
         this.posicionY = posicionY;
         this.id = id;
-
     }
 
     public int getPosicionX() {
@@ -29,5 +24,9 @@ public abstract class Cofre {
         return id;
     }
 
+    @Override
+    public String toString() {
+        return "Cofre: " + tipo + " con ID " + id ;
 
+    }
 }
