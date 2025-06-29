@@ -9,6 +9,7 @@ public class CofreProvisionActiva extends Cofre implements CofreProveedor {
 
         super(posicionX, posicionY, id);
         this.itemsOfrecidos = itemsOfrecidos;
+        this.tipo = TipoCofre.ACTIVO;
     }
 
     @Override

@@ -57,6 +57,9 @@ public class Main {
         estacion.setup();
         estacion.getMapa().mostrarMapaConContorno(estacion.getRobopuertos(),estacion.getCofres());
         estacion.atenderPedidos();
+
+        System.out.println("\n\nChequeando excedentes de los cofres...\n\n");
         estacion.chequearExcedentes();
+        estacion.mostrarAlmacenamiento();
     }
 }

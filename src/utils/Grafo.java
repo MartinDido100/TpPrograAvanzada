@@ -428,16 +428,13 @@ public class Grafo {
         double bateriaInicial = robot.getBateriaActual();
         cola.add(new Estado(origen, bateriaInicial, caminoInicial, 0));
 
-        System.out.println("🔄 Planificando desde nodo: " + getNodo(origen) + " hacia: " + getNodo(destino) + " con batería inicial: " + bateriaInicial);
+        System.out.println("🔄 Planificando desde nodo: " + getNodo(origen) + " hacia: " + getNodo(destino) + " con batería inicial: " + String.format("%.2f", bateriaInicial));
 
         while (!cola.isEmpty()) {
             Estado actual = cola.poll();
 
-            System.out.println("📍 Evaluando nodo: " + getNodo(actual.nodo) + ", batería: " + actual.bateriaRestante);
-
             if (mejorBateriaEnNodo.containsKey(actual.nodo)
                     && mejorBateriaEnNodo.get(actual.nodo) >= actual.bateriaRestante) {
-                System.out.println("⛔ Ya visitado con igual o más batería. Se omite.");
                 continue;
             }
             mejorBateriaEnNodo.put(actual.nodo, actual.bateriaRestante);
@@ -450,15 +447,11 @@ public class Grafo {
                 if ( consumoDestinoARobopuertoMasCercano <= bateriaQueQuedaAlLlegar ) {
                     // CONSUMO DE DESTINO A ROBOPUERTO MAS CERCANO > BATERIA QUE ME QUEDA AL LLEGAR
                     debeRecargar = false; // si cargando en este robopuerto, me alcanza la bateria para despues, recargo aca
-
                 }
-
 
             }
 
             if (actual.nodo == destino) {
-                System.out.println("✅ Se llegó al destino: " + getNodo(actual.nodo));
-
                 return new ResultadoDijkstra(getNodo(actual.nodo), actual.camino, actual.distanciaTotal);
             }
 
@@ -470,22 +463,14 @@ public class Grafo {
                 double consumo = distancia * Robot.getFactorConsumo();
                 double nuevaBateria = actual.bateriaRestante - consumo;
 
-                System.out.print("➡️ Intentando ir a " + getNodo(vecino) + " (distancia: " + distancia + ", consumo: " + consumo + ")... ");
-
                 if (nuevaBateria < 0) {
-                    System.out.println("❌ No alcanza la batería.");
                     continue;
                 }
 
                 if (esRobopuerto(vecino)) {
                     nuevaBateria = Robot.getBateriaTotal();
-                    System.out.println("⚡ Es robopuerto, recarga batería.");
-
                 }
 
-                else {
-                    System.out.println("✔️ Llega sin recarga.");
-                }
                 if(debeRecargar && !esRobopuerto(vecino)) { // necesito recargar en el medio
                     continue;
                 }
@@ -515,7 +500,7 @@ public class Grafo {
                 robot.recargar();
             }
 
-            System.out.println("🔋 Robot viaja de " + desde + " a " + hasta + " (dist: " + distancia + "), batería: " + robot.getBateriaActual());
+            System.out.println("🔋"+ robot + " viaja de " + desde + " a " + hasta + " (dist: " + String.format("%.2f", distancia) + "), batería: " + String.format("%.2f", robot.getBateriaActual()));
         }
     }
 }

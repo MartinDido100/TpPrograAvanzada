@@ -15,6 +15,7 @@ public class CofreBuffer extends Cofre implements CofreProveedor,CofreSolicitado
         super(posicionX, posicionY, id);
         this.itemsOfrecidos = itemsOfrecidos;
         this.solicitudes = new ArrayList<>();
+        this.tipo = TipoCofre.BUFER;
 
         for(DatosJson.Item item : solicitudes){
             this.solicitudes.add(new Item(item.getId(),item.getNombre(), item.getTipo(),item.getCantidad()));

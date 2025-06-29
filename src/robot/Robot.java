@@ -63,5 +63,8 @@ public class Robot {
         return BATERIA_TOTAL;
     }
 
-
+    @Override
+    public String toString() {
+        return "Robot con id " + id;
+    }
 }

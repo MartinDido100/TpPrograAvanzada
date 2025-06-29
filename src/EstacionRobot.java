@@ -356,4 +356,18 @@ public class EstacionRobot {
         }
 
     }
+
+    public void mostrarAlmacenamiento(){
+        System.out.println("\n\nAlmacenamiento de los cofres:\n");
+        for (CofreAlmacenamiento cofre : this.cofresAlmacenamiento) {
+            System.out.println("Cofre ID: " + cofre.getId() + " en posición (" + cofre.getPosicionX() + ", " + cofre.getPosicionY() + ")");
+            if (cofre.getAlmacenamiento().isEmpty()) {
+                System.out.println("  - No hay items almacenados.");
+            } else {
+                for (Item item : cofre.getAlmacenamiento()) {
+                    System.out.println("  - " + item);
+                }
+            }
+        }
+    }
 }
