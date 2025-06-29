@@ -1,8 +1,5 @@
 package cofre;
 
-import Item.Item;
-
-import java.util.HashMap;
 import java.util.Map;
 
 public class CofreProvisionActiva extends Cofre implements CofreProveedor {

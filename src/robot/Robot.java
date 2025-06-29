@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Robot {
-    private int id;
-    private int posicionX;
-    private int posicionY;
+    private final int id;
+    private final int posicionX;
+    private final int posicionY;
     private static double BATERIA_TOTAL = 10; //cantidad de celulas
     private double bateriaActual;
     private static double FACTOR_CONSUMO = 1.5; //consumo de celulas
@@ -42,9 +42,6 @@ public class Robot {
     public double getBateriaActual() {
         return bateriaActual;
     }
-    public List<Item> getItems() {
-        return items;
-    }
 
     public void recargar(){
         bateriaActual = BATERIA_TOTAL;
@@ -56,10 +53,6 @@ public class Robot {
 
     public boolean alcanzaBateria(double distancia){
         return bateriaActual >= distancia*FACTOR_CONSUMO;
-    }
-
-    public void addItem(Item item){
-        items.add(item);
     }
 
     public static double getFactorConsumo(){

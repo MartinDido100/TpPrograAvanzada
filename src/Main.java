@@ -4,11 +4,9 @@ import robopuerto.Robopuerto;
 import robot.Robot;
 import utils.DatosJson;
 import utils.FileReader;
-import utils.Grafo;
 
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Main {
     public static final String ROBOT_EMOJI = "🤖";
@@ -63,7 +61,5 @@ public class Main {
         estacion.getGrafo().mostrarNodos();
         estacion.atenderPedidos();
         estacion.chequearExcedentes();
-
-
     }
 }

@@ -1,13 +1,10 @@
 package cofre;
 
 import Item.Item;
-import Item.TipoItem;
 import utils.DatosJson;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CofreSolicitud extends Cofre implements CofreSolicitador{
     protected List<Item> solicitudes;

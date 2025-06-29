@@ -1,10 +1,5 @@
 package cofre;
 
-import Item.Item;
-
-import java.util.HashMap;
-import java.util.Map;
-
 public abstract class Cofre {
     protected int posicionX;
     protected int posicionY;
