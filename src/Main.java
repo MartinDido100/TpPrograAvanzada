@@ -55,10 +55,7 @@ public class Main {
         );
 
         estacion.setup();
-
         estacion.getMapa().mostrarMapaConContorno(estacion.getRobopuertos(),estacion.getCofres());
-        estacion.getGrafo().mostrarMatriz();
-        estacion.getGrafo().mostrarNodos();
         estacion.atenderPedidos();
         estacion.chequearExcedentes();
     }

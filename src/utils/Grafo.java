@@ -111,27 +111,6 @@ public class Grafo {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
-    public void mostrarMatriz() {
-        System.out.println("Matriz de Adyacencia:");
-        for (double[] doubles : matrizAdyacencia) {
-            for (double aDouble : doubles) {
-                if (aDouble == Double.POSITIVE_INFINITY) {
-                    System.out.print("INF ");
-                } else {
-                    System.out.printf("%.1f ", aDouble);
-                }
-            }
-            System.out.println();
-        }
-    }
-
-    public void mostrarNodos() {
-        System.out.println("Nodos:");
-        for (int i = 0; i < nodos.size(); i++) {
-            System.out.println(i + ": " + nodos.get(i));
-        }
-    }
-
     public ResultadoDijkstra obtenerRobopuertoConRobotMasCercano(Object origen) {
         ResultadoDijkstra resul = null;
         List<Object> caminoARobotMasCercano = new ArrayList<>();

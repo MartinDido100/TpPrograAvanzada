@@ -58,9 +58,6 @@ public class EstacionRobot {
         }
 
         this.calcularRobopuertosVecinos();
-        for (Robopuerto robopuerto : this.robopuertos) {
-            System.out.println(robopuerto.getRobopuertosVecinos());
-        }
         this.grafo = new Grafo(new ArrayList<>(robopuertos),new ArrayList<>(cofres));
     }
 
@@ -240,14 +237,6 @@ public class EstacionRobot {
         if(rutaCofreARobot != null){ // si no hay robot disponible, no puedo cumplir con el pedido
             Robopuerto robopuertoConRobotMasCercano = (Robopuerto)rutaCofreARobot.nodo;
             Robot robot = robopuertoConRobotMasCercano.getRobotsActuales().removeFirst();
-
-            System.out.println(rutaCofreARobot.distancia);
-            System.out.println(rutaCofreARobot.camino);
-            System.out.println(robot.getId());
-            System.out.println(robot.getPosicionX());
-            System.out.println(robot.getPosicionY());
-
-
 
             if(proveedor == null){ // si no hubo proveedor activo, busco uno pasivo
                 ResultadoDijkstra rutaACofreProveedor = this.grafo.obtenerCofreConObjetoMasCercano(robopuertoConRobotMasCercano,itemSolicitado); // robopuerto a proveecdor
