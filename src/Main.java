@@ -65,6 +65,6 @@ public class Main {
 
         System.out.println("\n\nChequeando excedentes de los cofres...\n\n");
         estacion.chequearExcedentes();
-        estacion.mostrarAlmacenamiento();
+        //  estacion.mostrarAlmacenamiento();
     }
 }

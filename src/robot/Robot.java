@@ -61,9 +61,6 @@ public class Robot {
         return FACTOR_CONSUMO;
     }
 
-    public static double getBateriaTotal(){
-        return BATERIA_TOTAL;
-    }
 
     @Override
     public String toString() {
