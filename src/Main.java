@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+
 public class Main {
     public static final String ROBOT_EMOJI = "🤖";
     public static final String COFRE = "\uD83D\uDCE6";
@@ -48,7 +49,6 @@ public class Main {
         estacion.setup();
         estacion.getMapa().mostrarMapaConContorno(estacion.getRobopuertos(),estacion.getCofres());
         estacion.atenderPedidos();
-        estacion.chequearExcedentes();
 
         if(!estacion.pedidosNoCumplidos.isEmpty()){
             System.out.println("No se pudo cumplir con estos pedidos: ");
@@ -61,5 +61,10 @@ public class Main {
             }
         }
 
+
+
+        System.out.println("\n\nChequeando excedentes de los cofres...\n\n");
+        estacion.chequearExcedentes();
+        estacion.mostrarAlmacenamiento();
     }
 }
