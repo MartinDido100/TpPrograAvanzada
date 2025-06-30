@@ -13,6 +13,7 @@ Comision: 01-4600
 Profesores:
 
 Aubin, Veronica Inés
+
 Videla, Lucas
 
 Grupo PSI
@@ -20,6 +21,9 @@ Grupo PSI
 Integrantes:
 
 Santamaría Loiacono Mathieu Andrés
+
 Martínez Solomita Fabricio Javier
+
 Martin Alejandro Didolich
+
 Emanuel Antonio Rodríguez
