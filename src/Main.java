@@ -1,3 +1,4 @@
+import Item.Item;
 import cofre.*;
 import mapa.Mapa;
 import robopuerto.Robopuerto;
@@ -6,7 +7,10 @@ import utils.DatosJson;
 import utils.FileReader;
 
 import java.util.InputMismatchException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 
 public class Main {
     public static final String ROBOT_EMOJI = "🤖";
@@ -31,32 +35,33 @@ public class Main {
 
         EstacionRobot estacion = new EstacionRobot(new Mapa(data.getMapa().getCasilleros()),robopuertos, robots);
 
-        data.getCofres().forEach(
-                cofre -> {
-                    switch (cofre.getTipo()){
-                        case ACTIVO -> {
-                            estacion.addCofreActivo(new CofreProvisionActiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(),cofre.getItemsOfrecidos()));
-                        }
-                        case PASIVO -> {
-                            estacion.addCofrePasivo(new CofreProvisionPasiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(),cofre.getItemsOfrecidos()));
-                        }
-                        case BUFER -> {
-                            estacion.addRequestChest(new CofreBuffer(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(),cofre.getItemsOfrecidos(),cofre.getSolicitudes()));
-                        }
-                        case ALMACENAMIENTO -> {
-                            estacion.addCofreAlmacenamiento(new CofreAlmacenamiento(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
-                        }
-                        case SOLICITUD -> {
-                            estacion.addRequestChest(new CofreSolicitud(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(),cofre.getSolicitudes()));
-                        }
-                        default -> throw new InputMismatchException("Tipo de cofre no reconocido");
-                    }
-                }
-        );
+        for (DatosJson.Cofre cofre : data.getCofres()) {
+            switch (cofre.getTipo()) {
+                case ACTIVO -> estacion.addCofreActivo(new CofreProvisionActiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(), cofre.getItemsOfrecidos()));
+                case PASIVO -> estacion.addCofrePasivo(new CofreProvisionPasiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(), cofre.getItemsOfrecidos()));
+                case BUFER -> estacion.addRequestChest(new CofreBuffer(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(), cofre.getItemsOfrecidos(), cofre.getSolicitudes()));
+                case ALMACENAMIENTO -> estacion.addCofreAlmacenamiento(new CofreAlmacenamiento(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
+                case SOLICITUD -> estacion.addRequestChest(new CofreSolicitud(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(), cofre.getSolicitudes()));
+                default -> throw new InputMismatchException("Tipo de cofre no reconocido");
+            }
+        }
 
         estacion.setup();
         estacion.getMapa().mostrarMapaConContorno(estacion.getRobopuertos(),estacion.getCofres());
         estacion.atenderPedidos();
+
+        if(!estacion.pedidosNoCumplidos.isEmpty()){
+            System.out.println("No se pudo cumplir con estos pedidos: ");
+
+            Iterator<Map.Entry<CofreSolicitador, Item>> it = estacion.pedidosNoCumplidos.entrySet().iterator();
+
+            while(it.hasNext()) {
+                Map.Entry<CofreSolicitador, Item> entry = it.next();
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+        }
+
+
 
         System.out.println("\n\nChequeando excedentes de los cofres...\n\n");
         estacion.chequearExcedentes();

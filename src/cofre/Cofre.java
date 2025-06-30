@@ -10,6 +10,7 @@ public abstract class Cofre {
         this.posicionX = posicionX;
         this.posicionY = posicionY;
         this.id = id;
+
     }
 
     public int getPosicionX() {
@@ -23,6 +24,7 @@ public abstract class Cofre {
     public int getId() {
         return id;
     }
+
 
     @Override
     public String toString() {

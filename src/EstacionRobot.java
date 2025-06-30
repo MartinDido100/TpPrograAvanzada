@@ -5,6 +5,7 @@ import robopuerto.Robopuerto;
 import robot.Robot;
 import utils.Grafo;
 import utils.ResultadoDijkstra;
+import utils.ResultadoRutas;
 
 import java.util.*;
 
@@ -18,6 +19,7 @@ public class EstacionRobot {
     List<CofreSolicitador> pedidos;
     List<Cofre>cofres;
     List<CofreProveedor> cofresProveedores;
+    Map<CofreSolicitador,Item> pedidosNoCumplidos;
     Grafo grafo;
 
     public EstacionRobot(Mapa mapa, List<Robopuerto> robopuertos, List<Robot> robots) {
@@ -30,6 +32,7 @@ public class EstacionRobot {
         this.cofresAlmacenamiento = new ArrayList<>();
         this.cofres = new ArrayList<>();
         this.cofresProveedores = new ArrayList<>();
+        this.pedidosNoCumplidos = new HashMap<>();
     }
 
     public void setup(){
@@ -91,18 +94,28 @@ public class EstacionRobot {
 
     public void atenderPedidos(){
         for (CofreSolicitador cofre : this.pedidos) {
+            int indice = grafo.nodos.indexOf(cofre);
+            ResultadoDijkstra dijkstraCofreSolicitud = grafo.dijkstraNodos[indice];
 
-            ResultadoDijkstra robopuertoMasCercanoCamino = grafo.obtenerRobopuertoMasCercano(cofre);
-            if(robopuertoMasCercanoCamino == null){
+            double menor = Double.MAX_VALUE;
+            Robopuerto robopuertoMasCercano = null;
+            for(int i=0;i<grafo.cantidadRobopuertos;i++){
+                Robopuerto robopuerto = (Robopuerto) grafo.nodos.get(i);
+                if(dijkstraCofreSolicitud.distancias[i] < menor && !robopuerto.getRobotsActuales().isEmpty() ){
+                    robopuertoMasCercano = robopuerto;
+                }
+            }
+            if(robopuertoMasCercano == null){
                 System.out.println("El cofre no tiene a ningun robopuerto en cobertura, no se puede completar el pedido");
+                for(Item i : cofre.getSolicitudes()){
+                    pedidosNoCumplidos.put(cofre,i);
+                }
                 return;
 
             }
 
             while(!cofre.getSolicitudes().isEmpty()){ // mientras quede pedidos
                 Iterator<Item> it = cofre.getSolicitudes().iterator();
-
-                Robopuerto robopuertoMasCercano = (Robopuerto) robopuertoMasCercanoCamino.nodo;
 
                 while (it.hasNext()) {
                     Item itemSolicitado = it.next();
@@ -122,6 +135,7 @@ public class EstacionRobot {
                     if (itemSolicitado.getCantidad() > cantidadTotalUniverso) {
                         System.out.println("Se solicita " + itemSolicitado.getCantidad() + " y solo hay la siguiente cantidad en todo el universo: " + cantidadTotalUniverso);
                         it.remove();
+                        pedidosNoCumplidos.put(cofre,itemSolicitado);
                         continue;
                     }
                     for (CofreProvisionActiva prov : this.cofresActivos) { // prioridad
@@ -132,7 +146,7 @@ public class EstacionRobot {
                             break;
                     }
 
-                    boolean completado = realizarEntrega((Cofre) cofre, itemSolicitado, proveedor);
+                    boolean completado = realizarEntrega((Cofre) cofre, itemSolicitado, proveedor,robopuertoMasCercano);
 
                     if (completado) {
                         it.remove(); // lo saco de solicitudes porque ya se entrego toda la cantidad
@@ -231,28 +245,47 @@ public class EstacionRobot {
         return cofres;
     }
 
-    public boolean realizarEntrega(Cofre cofre, Item itemSolicitado, CofreProveedor proveedor){
-        ResultadoDijkstra rutaCofreARobot = this.grafo.obtenerRobopuertoConRobotMasCercano(cofre); // me devuelve el robopuerto con robot disponible mas cercano
+    public boolean realizarEntrega(Cofre cofre, Item itemSolicitado, CofreProveedor proveedor,Robopuerto robopuertoConRobotMasCercano){
+
         boolean completado = false; // si no complete totalmente el pedido, no lo saco de la lista
-        if(rutaCofreARobot != null){ // si no hay robot disponible, no puedo cumplir con el pedido
-            Robopuerto robopuertoConRobotMasCercano = (Robopuerto)rutaCofreARobot.nodo;
+
             Robot robot = robopuertoConRobotMasCercano.getRobotsActuales().removeFirst();
+            int indiceRobopuertoConRobotMasCercano = grafo.nodos.indexOf(robopuertoConRobotMasCercano);
 
             if(proveedor == null){ // si no hubo proveedor activo, busco uno pasivo
-                ResultadoDijkstra rutaACofreProveedor = this.grafo.obtenerCofreConObjetoMasCercano(robopuertoConRobotMasCercano,itemSolicitado); // robopuerto a proveecdor
-                proveedor = (CofreProveedor) rutaACofreProveedor.nodo;
+                double menorDistancia = Double.MAX_VALUE;
+                int indiceCofre = -1;
+                Cofre cofreMasCercano = null;
+                for (int i = grafo.cantidadRobopuertos; i < grafo.cantidadRobopuertos+grafo.cantidadCofres; i++) { // busco el cofre con el item solicitado mas cercano
+                    cofreMasCercano = (Cofre) grafo.nodos.get(i);
+                    if (grafo.dijkstraNodos[indiceRobopuertoConRobotMasCercano].distancias[i] < menorDistancia && cofreMasCercano instanceof CofreProveedor &&
+                            (((CofreProveedor) cofreMasCercano).getOfrecimientos().containsKey(itemSolicitado.getNombre())) ) { // TODO: agregar atributo "tipo" a Cofre, para sacar el instanceof
+                        menorDistancia = grafo.dijkstraNodos[indiceRobopuertoConRobotMasCercano].distancias[i];
+                        indiceCofre = i;
+                    }
+                }
+                if (indiceCofre == -1)return false;
+                proveedor = (CofreProveedor) grafo.nodos.get(indiceCofre);
+            }
+            int indiceRobopuerto = grafo.nodos.indexOf(cofre);
+            ResultadoDijkstra dijkstraCofreSolicitud = grafo.dijkstraNodos[indiceRobopuerto];
+
+            double menor = Double.MAX_VALUE;
+            Robopuerto robopuertoMasCercano = null;
+            for(int i=0;i<grafo.cantidadRobopuertos;i++){
+                Robopuerto robopuerto = (Robopuerto) grafo.nodos.get(i);
+                if(dijkstraCofreSolicitud.distancias[i] < menor){
+                    robopuertoMasCercano = robopuerto;
+                }
             }
 
-            ResultadoDijkstra rutaARobopuertoMasCercano = this.grafo.obtenerRobopuertoMasCercano(cofre); // solicitante a robopuerto
-            Robopuerto robopuertoMasCercano = (Robopuerto)rutaARobopuertoMasCercano.nodo;
-
             // Paso 1: del robopuerto del robot al cofre proveedor
-            int indiceRobopuertoOrigen = grafo.nodos.indexOf(robopuertoConRobotMasCercano);
+
             int indiceCofreProveedor = grafo.nodos.indexOf(proveedor);
             int indiceCofreSolicitador = grafo.nodos.indexOf(cofre);
             int indiceRobopuertoMasCercano = grafo.nodos.indexOf(robopuertoMasCercano);
-            ResultadoDijkstra tramo1 = grafo.planificarRutaConRecargas(
-                    indiceRobopuertoOrigen,
+            ResultadoRutas  tramo1 = grafo.planificarRutaConRecargas(
+                    indiceRobopuertoConRobotMasCercano,
                     indiceCofreProveedor,
                     robot
             ); // puede ir directo o parar a recargar, este algoritmo sirve para ambos
@@ -267,7 +300,7 @@ public class EstacionRobot {
             int cantidadParaOfrecer = proveedor.getOfrecimientos().get(itemSolicitado.getNombre());
 
             // Paso 2: del cofre proveedor al cofre solicitador (con batería llena)
-            ResultadoDijkstra tramo2 = grafo.planificarRutaConRecargas(
+            ResultadoRutas tramo2 = grafo.planificarRutaConRecargas(
                     indiceCofreProveedor,
                     indiceCofreSolicitador,
                     robot
@@ -298,7 +331,7 @@ public class EstacionRobot {
             }
 
             // Paso 3: del cofre solicitador al robopuerto más cercano (para que el robot recargue)
-            ResultadoDijkstra tramo3 = grafo.planificarRutaConRecargas(
+            ResultadoRutas  tramo3 = grafo.planificarRutaConRecargas(
                     indiceCofreSolicitador,
                     indiceRobopuertoMasCercano,
                     robot
@@ -324,16 +357,41 @@ public class EstacionRobot {
 
             Robopuerto robopuertoFinal = (Robopuerto) tramo3.nodo;
             robopuertoFinal.getRobotsActuales().add(robot);
-        }
+
         return completado;
     }
 
-    public void chequearExcedentes(){
+   public void chequearExcedentes(){
         for (CofreProveedor prov : cofresProveedores) {
             if (prov.getOfrecimientos().isEmpty())
                 continue;
-            ResultadoDijkstra ruta = grafo.obtenerCofreExcedenteMasCercano(prov);
-            if(ruta == null)continue;
+            int indiceCofreProveedor = grafo.nodos.indexOf(prov);
+            ResultadoDijkstra DijkstraProv = grafo.dijkstraNodos[indiceCofreProveedor];
+
+            CofreAlmacenamiento CofreAlmacenador = null;
+            double menorDistancia = Double.MAX_VALUE;
+            for(int i=grafo.cantidadRobopuertos;i<grafo.nodos.size();i++){
+                Cofre cofre = (Cofre) grafo.nodos.get(i);
+
+                if(DijkstraProv.distancias[i] < menorDistancia && cofre instanceof CofreAlmacenamiento){
+                    menorDistancia = DijkstraProv.distancias[i];
+                    CofreAlmacenador = (CofreAlmacenamiento) cofre;
+                }
+            }
+            if(CofreAlmacenador == null)continue;
+
+            menorDistancia = Double.MAX_VALUE;
+            Robopuerto robopuertoMasCercano = null;
+            for(int i=0;i<grafo.cantidadRobopuertos;i++){
+                Robopuerto robopuerto = (Robopuerto) grafo.nodos.get(i);
+                if(DijkstraProv.distancias[i] < menorDistancia && !robopuerto.getRobotsActuales().isEmpty() ){
+                    robopuertoMasCercano = robopuerto;
+                }
+            }
+            if(robopuertoMasCercano == null){
+                System.out.println("El cofre no tiene a ningun robopuerto en cobertura, no se puede completar la entrega");
+                return;
+            }
 
             Iterator<Map.Entry<String, Integer>> it = prov.getOfrecimientos().entrySet().iterator();
 
@@ -341,11 +399,7 @@ public class EstacionRobot {
                 Map.Entry<String, Integer> entry = it.next();
                 Item itemExcedente = new Item(entry.getKey(), entry.getValue());
 
-
-
-                CofreAlmacenamiento cofreDestino = (CofreAlmacenamiento) ruta.nodo;
-
-                realizarEntrega(cofreDestino, itemExcedente, prov);
+                realizarEntrega(CofreAlmacenador, itemExcedente,prov,robopuertoMasCercano);
 
                 int cantidad = prov.getOfrecimientos().getOrDefault(entry.getKey(), 0);
 
@@ -355,19 +409,9 @@ public class EstacionRobot {
             }
         }
 
+
+
     }
 
-    public void mostrarAlmacenamiento(){
-        System.out.println("\n\nAlmacenamiento de los cofres:\n");
-        for (CofreAlmacenamiento cofre : this.cofresAlmacenamiento) {
-            System.out.println("Cofre ID: " + cofre.getId() + " en posición (" + cofre.getPosicionX() + ", " + cofre.getPosicionY() + ")");
-            if (cofre.getAlmacenamiento().isEmpty()) {
-                System.out.println("  - No hay items almacenados.");
-            } else {
-                for (Item item : cofre.getAlmacenamiento()) {
-                    System.out.println("  - " + item);
-                }
-            }
-        }
-    }
 }
+

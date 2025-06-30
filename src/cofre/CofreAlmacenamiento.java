@@ -8,8 +8,11 @@ import java.util.List;
 public class CofreAlmacenamiento extends Cofre{
     private List<Item> almacenamiento;
     public CofreAlmacenamiento(int posicionX, int posicionY, int id) {
+
         super(posicionX, posicionY, id);
+
         this.tipo = TipoCofre.ALMACENAMIENTO;
+
         almacenamiento = new ArrayList<>();
     }
 

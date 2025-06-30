@@ -55,6 +55,7 @@ public class Robot {
         return bateriaActual >= distancia*FACTOR_CONSUMO;
     }
 
+
     public static double getFactorConsumo(){
         return FACTOR_CONSUMO;
     }
@@ -67,4 +68,10 @@ public class Robot {
     public String toString() {
         return "Robot con id " + id;
     }
+
+    public static double getBateriaTotal(){
+        return BATERIA_TOTAL;
+    }
+
+
 }
