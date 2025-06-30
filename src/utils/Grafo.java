@@ -13,8 +13,9 @@ import java.util.*;
 public class Grafo {
     private final double[][] matrizAdyacencia;
     public ArrayList<Object> nodos;
-    private final int cantidadRobopuertos;
-    private final int cantidadCofres;
+    public final int cantidadRobopuertos;
+    public final int cantidadCofres;
+    public ResultadoDijkstra[] dijkstraNodos;
 
     public Grafo(ArrayList<Robopuerto> robopuertos, ArrayList<Cofre> cofres) {
         this.nodos = new ArrayList<>();
@@ -24,6 +25,7 @@ public class Grafo {
         this.cantidadCofres = cofres.size();
         this.cantidadRobopuertos = robopuertos.size();
         int n = nodos.size();
+        dijkstraNodos = new ResultadoDijkstra[n];
         matrizAdyacencia = new double[n][n];
 
         for (int i = 0; i < n; i++) {
@@ -33,6 +35,7 @@ public class Grafo {
         }
 
         construirMatriz(robopuertos, cofres);
+        calcularDijkstraNodos();
     }
 
     private void construirMatriz(ArrayList<Robopuerto> robopuertos, ArrayList<Cofre> cofres) {
@@ -391,7 +394,7 @@ public class Grafo {
         return matrizAdyacencia[nodo][vecino];
     }
 
-    public ResultadoDijkstra planificarRutaConRecargas(int origen, int destino, Robot robot) {
+    public ResultadoRutas  planificarRutaConRecargas(int origen, int destino, Robot robot) {
         class Estado {
             final int nodo;
             final double bateriaRestante;
@@ -408,9 +411,23 @@ public class Grafo {
 
         boolean debeRecargar = false;
         double distanciaADestino = this.getDistancia(origen, destino);
+
+
+        ResultadoDijkstra dijkstraDestino = dijkstraNodos[destino];
+
+        double menor = Double.MAX_VALUE;
+        Robopuerto robopuertoMasCercano = null;
+        for(int i=0;i<cantidadRobopuertos;i++){
+            Robopuerto robopuerto = (Robopuerto) nodos.get(i);
+            if(dijkstraDestino.distancias[i] < menor){
+                robopuertoMasCercano = robopuerto;
+            }
+        }
+        int indiceRobopuerto = nodos.indexOf(robopuertoMasCercano);
+        double distanciaRobopuertoADestino = dijkstraDestino.distancias[indiceRobopuerto];
         if(!esRobopuerto(destino) && robot.alcanzaBateria(distanciaADestino)) { // debo asegurarme que no queda en el aire despues, ya que va a ir directo
-            ResultadoDijkstra RutaRobopuertoMasCercanoADestino = obtenerRobopuertoMasCercano(this.getNodo(destino));
-            double consumoDestinoARobopuertoMasCercano = RutaRobopuertoMasCercanoADestino.distancia * Robot.getFactorConsumo();
+
+            double consumoDestinoARobopuertoMasCercano = distanciaRobopuertoADestino * Robot.getFactorConsumo();
             double bateriaQueQuedaAlLlegar = robot.getBateriaActual()-distanciaADestino*Robot.getFactorConsumo();
             if ( consumoDestinoARobopuertoMasCercano > bateriaQueQuedaAlLlegar ) {
                 // CONSUMO DE DESTINO A ROBOPUERTO MAS CERCANO > BATERIA QUE ME QUEDA AL LLEGAR
@@ -459,7 +476,7 @@ public class Grafo {
             if (actual.nodo == destino) {
                 System.out.println("✅ Se llegó al destino: " + getNodo(actual.nodo));
 
-                return new ResultadoDijkstra(getNodo(actual.nodo), actual.camino, actual.distanciaTotal);
+                return new ResultadoRutas(getNodo(actual.nodo), actual.camino, actual.distanciaTotal);
             }
 
             for (int vecino = 0; vecino < matrizAdyacencia.length; vecino++) {
@@ -501,7 +518,7 @@ public class Grafo {
         return null;
     }
 
-    public void aplicarRuta(ResultadoDijkstra resultado, Robot robot) {
+    public void aplicarRuta(ResultadoRutas  resultado, Robot robot) {
         for (int i = 1; i < resultado.camino.size(); i++) {
             Object desde = resultado.camino.get(i - 1);
             Object hasta = resultado.camino.get(i);
@@ -517,5 +534,56 @@ public class Grafo {
 
             System.out.println("🔋 Robot viaja de " + desde + " a " + hasta + " (dist: " + distancia + "), batería: " + robot.getBateriaActual());
         }
+    }
+
+    public void calcularDijkstraNodos(){
+        for(int i=0;i<nodos.size();i++){
+            ResultadoDijkstra resultado = null;
+            resultado = dijkstra(nodos.get(i));
+            dijkstraNodos[i] = resultado;
+        }
+    }
+
+    public ResultadoDijkstra dijkstra(Object origen){
+        ResultadoDijkstra resul = null;
+        int[] sucesores = new int[matrizAdyacencia.length];
+        PriorityQueue<Arista> heap = new PriorityQueue<>();
+        double[] distancia = new double[matrizAdyacencia.length];
+        boolean[] visitados = new boolean[matrizAdyacencia.length];
+        int o = nodos.indexOf(origen);
+
+        for(int i=0; i< matrizAdyacencia.length; i++) { // agrego todas las aristas del robopuerto actual
+            heap.add(new Arista(o,i,matrizAdyacencia[o][i]));
+            distancia[i] = matrizAdyacencia[o][i];
+            visitados[i] = false;
+            sucesores[i] = o;
+        }
+
+        while(!heap.isEmpty()) {
+            Arista masCercano = heap.poll();
+            int u = masCercano.destino;
+            if(visitados[u]) continue;
+            visitados[u] = true;
+
+            for(int v=0; v<matrizAdyacencia.length; v++) {
+                if(u == v)continue;
+
+                if(!visitados[v] && (distancia[v] > (distancia[u]+matrizAdyacencia[u][v]))){
+                    distancia[v] = distancia[u]+matrizAdyacencia[u][v]; // si me conviene pasar por u
+                    sucesores[v] = u; // para ir a v, paso por u
+                    heap.add(new Arista(u,v,distancia[v]));
+                    // distancia[v] es distancia de cofre a V, distancia[u] es distancia de cofre a donde estoy parado ahora
+                    //distancia[u]+matrizAdyacencia[u][v] es distancia a U + distancia de U a V, osea veo si conviene pasar por u para ir a v
+                }
+
+            }
+        }
+
+
+        resul = new ResultadoDijkstra(distancia,sucesores);
+
+
+        return resul;
+
     }
 }
