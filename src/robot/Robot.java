@@ -76,4 +76,4 @@ public class Robot {
         return capacidadCarga;
     }
 
-}
+
