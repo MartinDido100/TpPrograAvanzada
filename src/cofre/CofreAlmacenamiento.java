@@ -3,7 +3,6 @@ package cofre;
 import Item.Item;
 
 import java.util.ArrayList;
-
 import java.util.List;
 
 public class CofreAlmacenamiento extends Cofre{
@@ -11,6 +10,9 @@ public class CofreAlmacenamiento extends Cofre{
     public CofreAlmacenamiento(int posicionX, int posicionY, int id) {
 
         super(posicionX, posicionY, id);
+
+        this.tipo = TipoCofre.ALMACENAMIENTO;
+
         almacenamiento = new ArrayList<>();
     }
 

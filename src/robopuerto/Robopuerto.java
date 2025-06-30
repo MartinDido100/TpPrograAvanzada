@@ -56,4 +56,9 @@ public class Robopuerto {
     public void addCofreIncluido(Cofre cofre) {
         this.cofresIncluidos.add(cofre);
     }
+
+    @Override
+    public String toString() {
+        return "Robopuerto: " + id;
+    }
 }

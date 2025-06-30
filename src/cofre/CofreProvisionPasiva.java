@@ -8,6 +8,8 @@ public class CofreProvisionPasiva extends Cofre implements CofreProveedor{
     public CofreProvisionPasiva(int posicionX, int posicionY, int id, Map<String,Integer> itemsOfrecidos) {
         super(posicionX, posicionY, id);
         this.itemsOfrecidos = itemsOfrecidos;
+
+        this.tipo = TipoCofre.PASIVO;
     }
 
     @Override

@@ -1,9 +1,5 @@
 package utils;
 
-import robot.Robot;
-
-import java.util.List;
-
 public class ResultadoDijkstra {
     public double[] distancias;
     public int[] sucesores;
@@ -15,3 +11,4 @@ public class ResultadoDijkstra {
     }
 
 }
+

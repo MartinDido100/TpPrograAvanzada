@@ -15,10 +15,12 @@ public class CofreSolicitud extends Cofre implements CofreSolicitador{
         super(posicionX, posicionY, id);
         this.solicitudes = new ArrayList<Item>();
 
+        this.tipo = TipoCofre.SOLICITUD;
+
+
         for(DatosJson.Item item : solicitudes){
             this.solicitudes.add(new Item(item.getId(),item.getNombre(), item.getTipo(),item.getCantidad()));
         }
-
 
     }
 
