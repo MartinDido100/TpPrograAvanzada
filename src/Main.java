@@ -1,3 +1,4 @@
+import Item.Item;
 import cofre.*;
 import mapa.Mapa;
 import robopuerto.Robopuerto;
@@ -6,7 +7,9 @@ import utils.DatosJson;
 import utils.FileReader;
 
 import java.util.InputMismatchException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
     public static final String ROBOT_EMOJI = "🤖";
@@ -46,5 +49,17 @@ public class Main {
         estacion.getMapa().mostrarMapaConContorno(estacion.getRobopuertos(),estacion.getCofres());
         estacion.atenderPedidos();
         estacion.chequearExcedentes();
+
+        if(!estacion.pedidosNoCumplidos.isEmpty()){
+            System.out.println("No se pudo cumplir con estos pedidos: ");
+
+            Iterator<Map.Entry<CofreSolicitador, Item>> it = estacion.pedidosNoCumplidos.entrySet().iterator();
+
+            while(it.hasNext()) {
+                Map.Entry<CofreSolicitador, Item> entry = it.next();
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+        }
+
     }
 }
