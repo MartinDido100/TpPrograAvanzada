@@ -43,7 +43,7 @@
       "tipo": "PASIVO",
       "itemsOfrecidos":
       {
-        "Hierro" : 5,
+        "Hierro" : 10,
         "Oro" : 10
 
       }
@@ -54,7 +54,6 @@
       "tipo": "ACTIVO",
       "itemsOfrecidos":
       {
-        "Hierro" : 5,
         "Oro" : 10
       }
     }

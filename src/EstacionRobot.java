@@ -297,7 +297,7 @@ public class EstacionRobot {
             }
 
             grafo.aplicarRuta(tramo1,robot); // aplicar ruta lo que hace es consumir la bateria real del robot, y decir que ruta tomo hasta el objetivo
-            int cantidadParaOfrecer = proveedor.getOfrecimientos().get(itemSolicitado.getNombre());
+
 
             // Paso 2: del cofre proveedor al cofre solicitador (con batería llena)
             ResultadoRutas tramo2 = grafo.planificarRutaConRecargas(
@@ -312,17 +312,24 @@ public class EstacionRobot {
             }
 
             grafo.aplicarRuta(tramo2,robot);
+            int capacidadRobot = Robot.getCapacidadCarga();
+            int cantidadParaOfrecer = proveedor.getOfrecimientos().get(itemSolicitado.getNombre());
+
+            if(cantidadParaOfrecer>capacidadRobot){
+                cantidadParaOfrecer = capacidadRobot;
+            }
             if(cofre instanceof CofreSolicitador){
-                ((CofreSolicitador)cofre).cumplirSolicitud(itemSolicitado);
+
                 if(cantidadParaOfrecer >= itemSolicitado.getCantidad()){
                     proveedor.ofrecer(itemSolicitado.getNombre(), itemSolicitado.getCantidad());
                     itemSolicitado.setCantidad(0);
+                    ((CofreSolicitador)cofre).cumplirSolicitud(itemSolicitado);
                     completado = true; // si devuelvo true, saca el pedido de la lista
                 }
                 else
                 {
                     proveedor.ofrecer(itemSolicitado.getNombre(), cantidadParaOfrecer); // doy todooo
-                    itemSolicitado.setCantidad(itemSolicitado.getCantidad()-cantidadParaOfrecer); // no se cumplio todo
+                    itemSolicitado.setCantidad(itemSolicitado.getCantidad()-cantidadParaOfrecer); // no se cumplio todoo
                 }
             }
             else if(cofre instanceof CofreAlmacenamiento){

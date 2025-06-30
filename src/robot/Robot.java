@@ -12,6 +12,7 @@ public class Robot {
     private static double BATERIA_TOTAL = 10; //cantidad de celulas
     private double bateriaActual;
     private static double FACTOR_CONSUMO = 1.5; //consumo de celulas
+    private static int capacidadCarga = 5;
     List<Item> items;
 
     public Robot(int id, int posicionX, int posicionY, double bateriaTotal, double factorConsumo) {
@@ -60,9 +61,6 @@ public class Robot {
         return FACTOR_CONSUMO;
     }
 
-    public static double getBateriaTotal(){
-        return BATERIA_TOTAL;
-    }
 
     @Override
     public String toString() {
@@ -74,4 +72,8 @@ public class Robot {
     }
 
 
-}
+    public static int getCapacidadCarga() {
+        return capacidadCarga;
+    }
+
+
