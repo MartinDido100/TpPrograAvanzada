@@ -304,6 +304,7 @@ public class EstacionRobot {
             if (tramo1 == null) {
                 System.out.println("No se puede llegar al cofre proveedor.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
+                pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
                 return true; // si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
 
@@ -324,6 +325,7 @@ public class EstacionRobot {
                 System.out.println("No se puede entregar desde proveedor al solicitador.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
                 robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
+                pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
                 return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
 
             }
@@ -343,6 +345,7 @@ public class EstacionRobot {
                 System.out.println("No se puede regresar a ningún robopuerto después de entregar.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
                 robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
+                pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
                 return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
 
@@ -397,6 +400,11 @@ public class EstacionRobot {
     }
 
    public void chequearExcedentes(){
+
+        if(cofresAlmacenamiento.isEmpty()){
+            System.out.println("No existe ningun cofre de almacenamiento, por lo que no es posible almacenar items excedentes");
+            return;
+        }
         for (CofreProveedor prov : cofresProveedores) {
             if (prov.getOfrecimientos().isEmpty())
                 continue;
@@ -447,7 +455,7 @@ public class EstacionRobot {
 
     public void mostrarAlmacenamiento() {
         for (CofreAlmacenamiento cofre : this.cofresAlmacenamiento) {
-            System.out.println("Cofre de almacenamiento" + cofre.getId() + "en posición (" + cofre.getPosicionX() + ", " + cofre.getPosicionY() + "):");
+            System.out.println("Cofre de almacenamiento " + cofre.getId() + " en posición (" + cofre.getPosicionX() + ", " + cofre.getPosicionY() + "):");
 
             for (Map.Entry<String, Integer> entry : cofre.getAlmacenamiento().entrySet()) {
                 String nombre = entry.getKey();
