@@ -28,7 +28,7 @@ public abstract class Cofre {
 
     @Override
     public String toString() {
-        return "Cofre: " + tipo + " con ID " + id ;
+        return "cofre " + tipo + " con ID " + id ;
 
     }
 }

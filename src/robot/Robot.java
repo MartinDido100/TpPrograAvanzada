@@ -40,34 +40,36 @@ public class Robot {
     public int getPosicionY() {
         return posicionY;
     }
+
     public double getBateriaActual() {
         return bateriaActual;
     }
 
-    public void recargar(){
+    public void recargar() {
         bateriaActual = BATERIA_TOTAL;
     }
-    public void consumirBateria(double distancia){
-        bateriaActual-=  distancia*FACTOR_CONSUMO;
+
+    public void consumirBateria(double distancia) {
+        bateriaActual -= distancia * FACTOR_CONSUMO;
 
     }
 
-    public boolean alcanzaBateria(double distancia){
-        return bateriaActual >= distancia*FACTOR_CONSUMO;
+    public boolean alcanzaBateria(double distancia) {
+        return bateriaActual >= distancia * FACTOR_CONSUMO;
     }
 
 
-    public static double getFactorConsumo(){
+    public static double getFactorConsumo() {
         return FACTOR_CONSUMO;
     }
 
 
     @Override
     public String toString() {
-        return "Robot con id " + id;
+        return "robot con id " + id;
     }
 
-    public static double getBateriaTotal(){
+    public static double getBateriaTotal() {
         return BATERIA_TOTAL;
     }
 
@@ -75,5 +77,7 @@ public class Robot {
     public static int getCapacidadCarga() {
         return capacidadCarga;
     }
+
+}
 
 

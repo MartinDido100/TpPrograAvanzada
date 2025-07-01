@@ -94,6 +94,13 @@ public class EstacionRobot {
 
     public void atenderPedidos(){
         for (CofreSolicitador cofre : this.pedidos) {
+            String mensaje = "ATENDIENDO PEDIDO EN: " + cofre;
+            int ancho = mensaje.length() + 4;
+
+            System.out.println("\n\t" + "┌" + "─".repeat(ancho) + "┐");
+            System.out.println("\t" + "│  " + mensaje + "  │");
+            System.out.println("\t" + "└" + "─".repeat(ancho) + "┘");
+
             int indice = grafo.nodos.indexOf(cofre);
             ResultadoDijkstra dijkstraCofreSolicitud = grafo.dijkstraNodos[indice];
 
@@ -120,6 +127,8 @@ public class EstacionRobot {
                 while (it.hasNext()) {
                     Item itemSolicitado = it.next();
 
+                    System.out.println("\n💎 Se solicita el item: " + itemSolicitado);
+
                     CofreProveedor proveedor = null;
                     int cantidadTotalUniverso = 0;
 
@@ -133,7 +142,8 @@ public class EstacionRobot {
 
                     }
                     if (itemSolicitado.getCantidad() > cantidadTotalUniverso) {
-                        System.out.println("Se solicita " + itemSolicitado.getCantidad() + " y solo hay la siguiente cantidad en todo el universo: " + cantidadTotalUniverso);
+                        System.out.println("⚠️ Se solicitaron " + itemSolicitado.getCantidad() + " y solo hay la siguiente cantidad en todo el universo: " + cantidadTotalUniverso);
+                        System.out.println();
                         it.remove();
                         pedidosNoCumplidos.put(cofre,itemSolicitado);
                         continue;
@@ -259,7 +269,7 @@ public class EstacionRobot {
                 for (int i = grafo.cantidadRobopuertos; i < grafo.cantidadRobopuertos+grafo.cantidadCofres; i++) { // busco el cofre con el item solicitado mas cercano
                     cofreMasCercano = (Cofre) grafo.nodos.get(i);
                     if (grafo.dijkstraNodos[indiceRobopuertoConRobotMasCercano].distancias[i] < menorDistancia && cofreMasCercano instanceof CofreProveedor &&
-                            (((CofreProveedor) cofreMasCercano).getOfrecimientos().containsKey(itemSolicitado.getNombre())) ) { // TODO: agregar atributo "tipo" a Cofre, para sacar el instanceof
+                            (((CofreProveedor) cofreMasCercano).getOfrecimientos().containsKey(itemSolicitado.getNombre())) ) {
                         menorDistancia = grafo.dijkstraNodos[indiceRobopuertoConRobotMasCercano].distancias[i];
                         indiceCofre = i;
                     }
@@ -296,6 +306,9 @@ public class EstacionRobot {
                 return false;
             }
 
+            System.out.println(Main.ROBOT_EMOJI + " El " + robot + " sera el encargado de realizar el pedido");
+
+            System.out.println("🛣️ En el tramo 1 de la ruta:\n");
             grafo.aplicarRuta(tramo1,robot); // aplicar ruta lo que hace es consumir la bateria real del robot, y decir que ruta tomo hasta el objetivo
 
 
@@ -311,6 +324,7 @@ public class EstacionRobot {
                 return false;
             }
 
+            System.out.println("🛣️ En el tramo 2 de la ruta:");
             grafo.aplicarRuta(tramo2,robot);
             int capacidadRobot = Robot.getCapacidadCarga();
             int cantidadParaOfrecer = proveedor.getOfrecimientos().get(itemSolicitado.getNombre());
@@ -349,18 +363,24 @@ public class EstacionRobot {
                 return false;
             }
 
+            System.out.println("🛣️ En el tramo 3 de la ruta:");
             grafo.aplicarRuta(tramo3,robot);
 
-            // ✅ Si llegaste acá, tenés todos los tramos viables:
-            System.out.println("Ruta total:");
+            String titulo = "RUTA TOTAL REALIZADA";
+            int ancho = titulo.length() + 4;
+
+            System.out.println("\n\t" + "┌" + "─".repeat(ancho) + "┐");
+            System.out.println("\t" + "│  " + titulo + "  │");
+            System.out.println("\t" + "└" + "─".repeat(ancho) + "┘\n");
             System.out.println("Tramo 1 (al proveedor):");
-            tramo1.camino.forEach(System.out::println);
+            tramo1.camino.forEach(nodo -> System.out.println("\t---> " + nodo));
 
             System.out.println("Tramo 2 (al solicitador):");
-            tramo2.camino.forEach(System.out::println);
+            tramo2.camino.forEach(nodo -> System.out.println("\t---> " + nodo));
 
             System.out.println("Tramo 3 (a recarga final):");
-            tramo3.camino.forEach(System.out::println);
+            tramo3.camino.forEach(nodo -> System.out.println("\t---> " + nodo));
+
 
             Robopuerto robopuertoFinal = (Robopuerto) tramo3.nodo;
             robopuertoFinal.getRobotsActuales().add(robot);
@@ -415,9 +435,15 @@ public class EstacionRobot {
                 }
             }
         }
+    }
 
-
-
+    public void mostrarAlmacenamiento() {
+        for (CofreAlmacenamiento cofre : this.cofresAlmacenamiento) {
+            System.out.println("Cofre de almacenamiento" + cofre.getId() + "en posición (" + cofre.getPosicionX() + ", " + cofre.getPosicionY() + "):");
+            for (Item item : cofre.getAlmacenamiento()) {
+                System.out.println(" - " + item.getNombre() + ": " + item.getCantidad());
+            }
+        }
     }
 
 }

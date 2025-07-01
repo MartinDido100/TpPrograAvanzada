@@ -1,9 +1,6 @@
 package utils;
 
-import Item.Item;
 import cofre.Cofre;
-import cofre.CofreAlmacenamiento;
-import cofre.CofreProveedor;
 import robopuerto.Robopuerto;
 import robot.Robot;
 
@@ -172,7 +169,6 @@ public class Grafo {
             if ( consumoDestinoARobopuertoMasCercano > bateriaQueQuedaAlLlegar ) {
                 // CONSUMO DE DESTINO A ROBOPUERTO MAS CERCANO > BATERIA QUE ME QUEDA AL LLEGAR
                 debeRecargar = true; // obligo a que, aunque llegue directo, pare en el medio a recargar
-                System.out.println("Debe recargar en el medio, para no quedarse sin bateria luego");
             }
         }
 
@@ -184,7 +180,8 @@ public class Grafo {
         double bateriaInicial = robot.getBateriaActual();
         cola.add(new Estado(origen, bateriaInicial, caminoInicial, 0));
 
-        System.out.println("🔄 Planificando desde nodo: " + getNodo(origen) + " hacia: " + getNodo(destino) + " con batería inicial: " + bateriaInicial);
+        System.out.println("🔄 Planificando desde nodo: " + getNodo(origen) + " hacia: " + getNodo(destino) + " con batería inicial: " + String.format("%.2f", bateriaInicial));
+        System.out.println();
 
         while (!cola.isEmpty()) {
             Estado actual = cola.poll();
@@ -208,13 +205,9 @@ public class Grafo {
                     debeRecargar = false; // si cargando en este robopuerto, me alcanza la bateria para despues, recargo aca
 
                 }
-
-
             }
 
             if (actual.nodo == destino) {
-                System.out.println("✅ Se llegó al destino: " + getNodo(actual.nodo));
-
                 return new ResultadoRutas(getNodo(actual.nodo), actual.camino, actual.distanciaTotal);
             }
 
@@ -250,8 +243,6 @@ public class Grafo {
                 cola.add(new Estado(vecino, nuevaBateria, nuevoCamino, actual.distanciaTotal + distancia));
             }
         }
-
-        System.out.println("🚫 No se encontró una ruta viable desde " + getNodo(origen) + " hasta " + getNodo(destino));
         return null;
     }
 
@@ -269,7 +260,8 @@ public class Grafo {
                 robot.recargar();
             }
 
-            System.out.println("🔋 Robot viaja de " + desde + " a " + hasta + " (dist: " + distancia + "), batería: " + robot.getBateriaActual());
+            System.out.println("🔋 El robot viaja desde " + desde + " hacia " + hasta + " (dist: " + String.format("%.2f",distancia) + "), batería resultante: " + String.format("%.2f", robot.getBateriaActual()));
+            System.out.println();
         }
     }
 

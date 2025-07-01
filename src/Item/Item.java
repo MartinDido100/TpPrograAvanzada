@@ -41,7 +41,7 @@ public class Item {
 
     @Override
     public String toString() {
-        return nombre + "con cantidad " + cantidad;
+        return nombre + " con cantidad " + cantidad;
     }
 
 }

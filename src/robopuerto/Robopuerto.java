@@ -59,6 +59,6 @@ public class Robopuerto {
 
     @Override
     public String toString() {
-        return "Robopuerto: " + id;
+        return "robopuerto con id " + id;
     }
 }

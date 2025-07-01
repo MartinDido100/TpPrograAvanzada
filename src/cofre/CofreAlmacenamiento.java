@@ -21,7 +21,6 @@ public class CofreAlmacenamiento extends Cofre{
     }
 
     public void almacenar(Item item) {
-        System.out.println("Almacena el item "+item);
         almacenamiento.add(item);
     }
 }
