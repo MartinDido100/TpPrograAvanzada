@@ -6,10 +6,7 @@ import robot.Robot;
 import utils.DatosJson;
 import utils.FileReader;
 
-import java.util.InputMismatchException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class Main {
@@ -42,7 +39,23 @@ public class Main {
                 case PASIVO -> estacion.addCofrePasivo(new CofreProvisionPasiva(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(), cofre.getItemsOfrecidos()));
                 case BUFER -> estacion.addRequestChest(new CofreBuffer(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(), cofre.getItemsOfrecidos(), cofre.getSolicitudes()));
                 case ALMACENAMIENTO -> estacion.addCofreAlmacenamiento(new CofreAlmacenamiento(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId()));
-                case SOLICITUD -> estacion.addRequestChest(new CofreSolicitud(cofre.getPosicionX(), cofre.getPosicionY(), cofre.getId(), cofre.getSolicitudes()));
+                case SOLICITUD -> {
+                    List<Item> solicitudesConvertidas = new ArrayList<>();
+                    for (DatosJson.Item item : cofre.getSolicitudes()) {
+                        solicitudesConvertidas.add(new Item(
+                                item.getId(),
+                                item.getNombre(),
+                                item.getTipo(),
+                                item.getCantidad()
+                        ));
+                    }
+                    estacion.addRequestChest(new CofreSolicitud(
+                            cofre.getPosicionX(),
+                            cofre.getPosicionY(),
+                            cofre.getId(),
+                            solicitudesConvertidas
+                    ));
+                }
                 default -> throw new InputMismatchException("Tipo de cofre no reconocido");
             }
         }

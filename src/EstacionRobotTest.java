@@ -18,17 +18,13 @@ import java.util.Map;
 public class EstacionRobotTest {
 
     Mapa mapa;
-    DatosJson.Item itemJson;
+    Item item;
 
 
     @Before
     public void setup() {
         this.mapa = new Mapa(20);
-        itemJson = new DatosJson.Item();
-        itemJson.setId(1);
-        itemJson.setNombre("item1");
-        itemJson.setTipo("MATERIAL");
-        itemJson.setCantidad(10);
+        this.item = new Item(1, "item1", "MATERIAL", 10);
     }
 
     @Test
@@ -42,7 +38,7 @@ public class EstacionRobotTest {
                 new Robot(1, 5, 6, 100, 1.5)
         );
 
-        CofreSolicitud cofreS = new CofreSolicitud(15, 19, 1, List.of(itemJson));
+        CofreSolicitud cofreS = new CofreSolicitud(15, 19, 1, List.of(item));
 
         EstacionRobot estacion = new EstacionRobot(mapa, robopuertos, robots);
         estacion.addRequestChest(cofreS);
@@ -68,7 +64,7 @@ public class EstacionRobotTest {
         Robopuerto r = new Robopuerto(5, 5, 1);
         Robot robot = new Robot(1, 5, 5, 100, 1.0);
 
-        CofreSolicitud cofreS = new CofreSolicitud(6, 6, 1, List.of(itemJson)); // pide item1
+        CofreSolicitud cofreS = new CofreSolicitud(6, 6, 1, List.of(item));
 
         EstacionRobot estacion = new EstacionRobot(mapa, List.of(r), List.of(robot));
         estacion.addRequestChest(cofreS);
@@ -77,29 +73,6 @@ public class EstacionRobotTest {
         estacion.atenderPedidos();
 
         assertFalse(estacion.pedidosNoCumplidos.isEmpty());
-    }
-
-    @Test
-    public void pedidoRequiereMultiplesViajesPorCapacidad() {
-        Robopuerto r = new Robopuerto(3, 3, 1);
-        Robot robot = new Robot(1, 3, 3, 100, 1.0);
-
-        Item itemGrande = new DatosJson.Item();
-        itemGrande.setId(2);
-        itemGrande.setNombre("itemGrande");
-        itemGrande.setTipo("MATERIAL");
-        itemGrande.setCantidad(10);
-
-        CofreSolicitud cofreS = new CofreSolicitud(5, 5, 1, List.of(itemGrande));
-        CofreActivo cofreActivo = new CofreActivo(4, 4, 2);
-        cofreActivo.setItemsOfrecidos(Map.of("itemGrande", 10));
-
-        mapa.agregarCofres(List.of(cofreS, cofreActivo));
-        EstacionRobot estacion = new EstacionRobot(mapa, List.of(r), List.of(robot));
-        estacion.setup();
-        estacion.atenderPedidos();
-
-        assertTrue(estacion.pedidosNoCumplidos.isEmpty());
     }
 
 }

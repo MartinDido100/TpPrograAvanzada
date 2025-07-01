@@ -44,4 +44,12 @@ public class Item {
         return nombre + " con cantidad " + cantidad;
     }
 
+    public int getId() {
+        return id;
+    }
+
+
+    public String getTipo() {
+        return tipo.toString();
+    }
 }

@@ -11,19 +11,18 @@ public class CofreSolicitud extends Cofre implements CofreSolicitador{
 
 
 
-    public CofreSolicitud(int posicionX, int posicionY, int id, List<DatosJson.Item> solicitudes) {
+    public CofreSolicitud(int posicionX, int posicionY, int id, List<Item> solicitudes) {
         super(posicionX, posicionY, id);
         this.solicitudes = new ArrayList<Item>();
 
         this.tipo = TipoCofre.SOLICITUD;
 
 
-        for(DatosJson.Item item : solicitudes){
+        for(Item item : solicitudes){
             this.solicitudes.add(new Item(item.getId(),item.getNombre(), item.getTipo(),item.getCantidad()));
         }
 
     }
-
 
     @Override
     public void cumplirSolicitud(Item item) {
