@@ -440,8 +440,11 @@ public class EstacionRobot {
     public void mostrarAlmacenamiento() {
         for (CofreAlmacenamiento cofre : this.cofresAlmacenamiento) {
             System.out.println("Cofre de almacenamiento" + cofre.getId() + "en posición (" + cofre.getPosicionX() + ", " + cofre.getPosicionY() + "):");
-            for (Item item : cofre.getAlmacenamiento()) {
-                System.out.println(" - " + item.getNombre() + ": " + item.getCantidad());
+
+            for (Map.Entry<String, Integer> entry : cofre.getAlmacenamiento().entrySet()) {
+                String nombre = entry.getKey();
+                Integer cantidad = entry.getValue();
+                System.out.println(" - " + nombre + ": " + cantidad);
             }
         }
     }
