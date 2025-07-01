@@ -19,7 +19,7 @@ public class EstacionRobot {
     List<CofreSolicitador> pedidos;
     List<Cofre>cofres;
     List<CofreProveedor> cofresProveedores;
-    Map<CofreSolicitador,Item> pedidosNoCumplidos;
+    Map<Cofre,Item> pedidosNoCumplidos;
     Grafo grafo;
 
     public EstacionRobot(Mapa mapa, List<Robopuerto> robopuertos, List<Robot> robots) {
@@ -121,7 +121,7 @@ public class EstacionRobot {
                 if(robopuertoMasCercano == null){
                     System.out.println("El cofre no tiene a ningun robopuerto en cobertura, no se puede completar el pedido");
                     for(Item i : cofre.getSolicitudes()){
-                        pedidosNoCumplidos.put(cofre,i);
+                        pedidosNoCumplidos.put((Cofre) cofre,i);
                     }
                     return;
 
@@ -148,7 +148,7 @@ public class EstacionRobot {
                         System.out.println("⚠️ Se solicitaron " + itemSolicitado.getCantidad() + " y solo hay la siguiente cantidad en todo el universo: " + cantidadTotalUniverso);
                         System.out.println();
                         it.remove();
-                        pedidosNoCumplidos.put(cofre,itemSolicitado);
+                        pedidosNoCumplidos.put((Cofre) cofre,itemSolicitado);
                         continue;
                     }
                     for (CofreProvisionActiva prov : this.cofresActivos) { // prioridad
@@ -308,7 +308,7 @@ public class EstacionRobot {
             if (tramo1 == null) {
                 System.out.println("No se puede llegar al cofre proveedor.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
-                if(cofre instanceof CofreSolicitador)pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
+                pedidosNoCumplidos.put((Cofre)cofre,itemSolicitado);
                 return true; // si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
 
@@ -329,7 +329,7 @@ public class EstacionRobot {
                 System.out.println("No se puede entregar desde proveedor al solicitador.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
                 robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
-                if(cofre instanceof CofreSolicitador)pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
+                pedidosNoCumplidos.put((Cofre)cofre,itemSolicitado);
                 return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
 
             }
@@ -349,7 +349,7 @@ public class EstacionRobot {
                 System.out.println("No se puede regresar a ningún robopuerto después de entregar.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
                 robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
-                if(cofre instanceof CofreSolicitador)pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
+                pedidosNoCumplidos.put((Cofre)cofre,itemSolicitado);
                 return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
 
@@ -405,15 +405,24 @@ public class EstacionRobot {
 
    public void chequearExcedentes(){
 
-        if(cofresAlmacenamiento.isEmpty()){
-            System.out.println("No existe ningun cofre de almacenamiento, por lo que no es posible almacenar items excedentes");
-            return;
-        }
+
         for (CofreProveedor prov : cofresProveedores) {
-            if (prov.getOfrecimientos().isEmpty())
+
+            if(cofresAlmacenamiento.isEmpty()){
+                Iterator<Map.Entry<String, Integer>> it = prov.getOfrecimientos().entrySet().iterator();
+                while (it.hasNext()) {
+
+                    Map.Entry<String, Integer> entry = it.next();
+                    Item itemExcedente = new Item(entry.getKey(), entry.getValue());
+
+                    pedidosNoCumplidos.put((Cofre)prov,itemExcedente);
+                }
+                System.out.println("No existe ningun cofre de almacenamiento, por lo que no es posible completar este pedido");
                 continue;
+            }
             int indiceCofreProveedor = grafo.nodos.indexOf(prov);
             ResultadoDijkstra DijkstraProv = grafo.dijkstraNodos[indiceCofreProveedor];
+
 
             CofreAlmacenamiento CofreAlmacenador = null;
             double menorDistancia = Double.MAX_VALUE;

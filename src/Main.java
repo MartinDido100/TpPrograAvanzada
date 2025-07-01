@@ -78,10 +78,10 @@ public class Main {
 
             System.out.println("Los pedidos que no se cumplieron fueron: ");
 
-            Iterator<Map.Entry<CofreSolicitador, Item>> it = estacion.pedidosNoCumplidos.entrySet().iterator();
+            Iterator<Map.Entry<Cofre, Item>> it = estacion.pedidosNoCumplidos.entrySet().iterator();
 
             while(it.hasNext()) {
-                Map.Entry<CofreSolicitador, Item> entry = it.next();
+                Map.Entry<Cofre, Item> entry = it.next();
                 String key = entry.getKey().toString();
                 String capitalizedKey = key.substring(0, 1).toUpperCase() + key.substring(1);
                 System.out.println(capitalizedKey + ": " + entry.getValue());
@@ -94,8 +94,10 @@ public class Main {
             System.out.println("\t" + "│  " + mensaje + "  │");
             System.out.println("\t" + "└" + "─".repeat(ancho) + "┘");
         }
+        if(!estacion.cofresAlmacenamiento.isEmpty()){
+            System.out.println("\n\nLos cofres de almacenamiento quedaron de la siguiente manera:...\n\n");
+            estacion.mostrarAlmacenamiento();
+        }
 
-        System.out.println("\n\nLos cofres de almacenamiento quedaron de la siguiente manera:...\n\n");
-        estacion.mostrarAlmacenamiento();
     }
 }
