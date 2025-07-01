@@ -274,23 +274,32 @@ public class Grafo {
     }
 
     public ResultadoDijkstra dijkstra(Object origen){
+
+        class Nodo {
+            int nodo;
+            double distancia;
+
+            Nodo(int nodo, double distanciaTotal) {
+                this.nodo = nodo;
+                this.distancia = distanciaTotal;
+            }
+        }
         ResultadoDijkstra resul = null;
         int[] sucesores = new int[matrizAdyacencia.length];
-        PriorityQueue<Arista> heap = new PriorityQueue<>();
+        PriorityQueue<Nodo> heap = new PriorityQueue<>(Comparator.comparingDouble(n -> n.distancia));
         double[] distancia = new double[matrizAdyacencia.length];
         boolean[] visitados = new boolean[matrizAdyacencia.length];
         int o = nodos.indexOf(origen);
 
         for(int i=0; i< matrizAdyacencia.length; i++) { // agrego todas las aristas del robopuerto actual
-            heap.add(new Arista(o,i,matrizAdyacencia[o][i]));
             distancia[i] = matrizAdyacencia[o][i];
             visitados[i] = false;
             sucesores[i] = o;
         }
-
+        heap.add(new Nodo(o,0));
         while(!heap.isEmpty()) {
-            Arista masCercano = heap.poll();
-            int u = masCercano.destino;
+            Nodo masCercano = heap.poll();
+            int u = masCercano.nodo;
             if(visitados[u]) continue;
             visitados[u] = true;
 
@@ -300,9 +309,8 @@ public class Grafo {
                 if(!visitados[v] && (distancia[v] > (distancia[u]+matrizAdyacencia[u][v]))){
                     distancia[v] = distancia[u]+matrizAdyacencia[u][v]; // si me conviene pasar por u
                     sucesores[v] = u; // para ir a v, paso por u
-                    heap.add(new Arista(u,v,distancia[v]));
-                    // distancia[v] es distancia de cofre a V, distancia[u] es distancia de cofre a donde estoy parado ahora
-                    //distancia[u]+matrizAdyacencia[u][v] es distancia a U + distancia de U a V, osea veo si conviene pasar por u para ir a v
+                    heap.add(new Nodo(v,distancia[v]));
+
                 }
 
             }

@@ -303,6 +303,7 @@ public class EstacionRobot {
 
             if (tramo1 == null) {
                 System.out.println("No se puede llegar al cofre proveedor.");
+                robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
                 return true; // si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
 
@@ -321,6 +322,7 @@ public class EstacionRobot {
 
             if (tramo2 == null) {
                 System.out.println("No se puede entregar desde proveedor al solicitador.");
+                robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
                 robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
                 return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
 
@@ -339,6 +341,7 @@ public class EstacionRobot {
 
             if (tramo3 == null) {
                 System.out.println("No se puede regresar a ningún robopuerto después de entregar.");
+                robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
                 robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
                 return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
