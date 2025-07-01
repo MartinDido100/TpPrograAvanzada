@@ -101,28 +101,31 @@ public class EstacionRobot {
             System.out.println("\t" + "│  " + mensaje + "  │");
             System.out.println("\t" + "└" + "─".repeat(ancho) + "┘");
 
-            int indice = grafo.nodos.indexOf(cofre);
-            ResultadoDijkstra dijkstraCofreSolicitud = grafo.dijkstraNodos[indice];
 
-            double menor = Double.MAX_VALUE;
-            Robopuerto robopuertoMasCercano = null;
-            for(int i=0;i<grafo.cantidadRobopuertos;i++){
-                Robopuerto robopuerto = (Robopuerto) grafo.nodos.get(i);
-                if(dijkstraCofreSolicitud.distancias[i] < menor && !robopuerto.getRobotsActuales().isEmpty() ){
-                    robopuertoMasCercano = robopuerto;
-                }
-            }
-            if(robopuertoMasCercano == null){
-                System.out.println("El cofre no tiene a ningun robopuerto en cobertura, no se puede completar el pedido");
-                for(Item i : cofre.getSolicitudes()){
-                    pedidosNoCumplidos.put(cofre,i);
-                }
-                return;
-
-            }
 
             while(!cofre.getSolicitudes().isEmpty()){ // mientras quede pedidos
                 Iterator<Item> it = cofre.getSolicitudes().iterator();
+
+                int indice = grafo.nodos.indexOf(cofre);
+                ResultadoDijkstra dijkstraCofreSolicitud = grafo.dijkstraNodos[indice];
+
+                double menor = Double.MAX_VALUE;
+                Robopuerto robopuertoMasCercano = null;
+                for(int i=0;i<grafo.cantidadRobopuertos;i++){
+                    Robopuerto robopuerto = (Robopuerto) grafo.nodos.get(i);
+                    if(dijkstraCofreSolicitud.distancias[i] < menor && !robopuerto.getRobotsActuales().isEmpty() ){
+                        robopuertoMasCercano = robopuerto;
+                        menor = dijkstraCofreSolicitud.distancias[i];
+                    }
+                }
+                if(robopuertoMasCercano == null){
+                    System.out.println("El cofre no tiene a ningun robopuerto en cobertura, no se puede completar el pedido");
+                    for(Item i : cofre.getSolicitudes()){
+                        pedidosNoCumplidos.put(cofre,i);
+                    }
+                    return;
+
+                }
 
                 while (it.hasNext()) {
                     Item itemSolicitado = it.next();
@@ -286,9 +289,10 @@ public class EstacionRobot {
                 Robopuerto robopuerto = (Robopuerto) grafo.nodos.get(i);
                 if(dijkstraCofreSolicitud.distancias[i] < menor){
                     robopuertoMasCercano = robopuerto;
+                    menor = dijkstraCofreSolicitud.distancias[i];
                 }
             }
-
+            System.out.println(robopuertoMasCercano);
             // Paso 1: del robopuerto del robot al cofre proveedor
 
             int indiceCofreProveedor = grafo.nodos.indexOf(proveedor);
@@ -423,24 +427,28 @@ public class EstacionRobot {
             }
             if(CofreAlmacenador == null)continue;
 
-            menorDistancia = Double.MAX_VALUE;
-            Robopuerto robopuertoMasCercano = null;
-            for(int i=0;i<grafo.cantidadRobopuertos;i++){
-                Robopuerto robopuerto = (Robopuerto) grafo.nodos.get(i);
-                if(DijkstraProv.distancias[i] < menorDistancia && !robopuerto.getRobotsActuales().isEmpty() ){
-                    robopuertoMasCercano = robopuerto;
-                }
-            }
-            if(robopuertoMasCercano == null){
-                System.out.println("El cofre no tiene a ningun robopuerto en cobertura, no se puede completar la entrega");
-                return;
-            }
+
 
             Iterator<Map.Entry<String, Integer>> it = prov.getOfrecimientos().entrySet().iterator();
 
             while (it.hasNext()) {
                 Map.Entry<String, Integer> entry = it.next();
                 Item itemExcedente = new Item(entry.getKey(), entry.getValue());
+
+                menorDistancia = Double.MAX_VALUE;
+                Robopuerto robopuertoMasCercano = null;
+                ResultadoDijkstra DijkstraAlmacenador = grafo.dijkstraNodos[grafo.nodos.indexOf(CofreAlmacenador)];
+                for(int i=0;i<grafo.cantidadRobopuertos;i++){
+                    Robopuerto robopuerto = (Robopuerto) grafo.nodos.get(i);
+                    if(DijkstraAlmacenador.distancias[i] < menorDistancia && !robopuerto.getRobotsActuales().isEmpty() ){
+                        robopuertoMasCercano = robopuerto;
+                        menorDistancia = DijkstraAlmacenador.distancias[i];
+                    }
+                }
+                if(robopuertoMasCercano == null){
+                    System.out.println("El cofre no tiene a ningun robopuerto en cobertura, no se puede completar la entrega");
+                    return;
+                }
 
                 realizarEntrega(CofreAlmacenador, itemExcedente,prov,robopuertoMasCercano);
 

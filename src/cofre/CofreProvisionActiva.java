@@ -20,7 +20,7 @@ public class CofreProvisionActiva extends Cofre implements CofreProveedor {
             this.itemsOfrecidos.remove(item);
         }
         else {
-
+            this.itemsOfrecidos.remove(item);
             this.itemsOfrecidos.put(item,cantidadActual-cantidad);
         }
 
