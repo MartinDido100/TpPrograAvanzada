@@ -303,7 +303,7 @@ public class EstacionRobot {
 
             if (tramo1 == null) {
                 System.out.println("No se puede llegar al cofre proveedor.");
-                return false;
+                return true; // si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
 
             System.out.println(Main.ROBOT_EMOJI + " El " + robot + " sera el encargado de realizar el pedido");
@@ -321,35 +321,14 @@ public class EstacionRobot {
 
             if (tramo2 == null) {
                 System.out.println("No se puede entregar desde proveedor al solicitador.");
-                return false;
+                robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
+                return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
+
             }
 
             System.out.println("🛣️ En el tramo 2 de la ruta:");
             grafo.aplicarRuta(tramo2,robot);
-            int capacidadRobot = Robot.getCapacidadCarga();
-            int cantidadParaOfrecer = proveedor.getOfrecimientos().get(itemSolicitado.getNombre());
 
-            if(cantidadParaOfrecer>capacidadRobot){
-                cantidadParaOfrecer = capacidadRobot;
-            }
-            if(cofre instanceof CofreSolicitador){
-
-                if(cantidadParaOfrecer >= itemSolicitado.getCantidad()){
-                    proveedor.ofrecer(itemSolicitado.getNombre(), itemSolicitado.getCantidad());
-                    itemSolicitado.setCantidad(0);
-                    ((CofreSolicitador)cofre).cumplirSolicitud(itemSolicitado);
-                    completado = true; // si devuelvo true, saca el pedido de la lista
-                }
-                else
-                {
-                    proveedor.ofrecer(itemSolicitado.getNombre(), cantidadParaOfrecer); // doy todooo
-                    itemSolicitado.setCantidad(itemSolicitado.getCantidad()-cantidadParaOfrecer); // no se cumplio todoo
-                }
-            }
-            else if(cofre instanceof CofreAlmacenamiento){
-                ((CofreAlmacenamiento)cofre).almacenar(itemSolicitado);
-
-            }
 
             // Paso 3: del cofre solicitador al robopuerto más cercano (para que el robot recargue)
             ResultadoRutas  tramo3 = grafo.planificarRutaConRecargas(
@@ -360,8 +339,34 @@ public class EstacionRobot {
 
             if (tramo3 == null) {
                 System.out.println("No se puede regresar a ningún robopuerto después de entregar.");
-                return false;
+                robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
+                return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
+
+        int capacidadRobot = Robot.getCapacidadCarga();
+        int cantidadParaOfrecer = proveedor.getOfrecimientos().get(itemSolicitado.getNombre());
+
+        if(cantidadParaOfrecer>capacidadRobot){
+            cantidadParaOfrecer = capacidadRobot;
+        }
+        if(cofre instanceof CofreSolicitador){
+
+            if(cantidadParaOfrecer >= itemSolicitado.getCantidad()){
+                proveedor.ofrecer(itemSolicitado.getNombre(), itemSolicitado.getCantidad());
+                itemSolicitado.setCantidad(0);
+                ((CofreSolicitador)cofre).cumplirSolicitud(itemSolicitado);
+                completado = true; // si devuelvo true, saca el pedido de la lista
+            }
+            else
+            {
+                proveedor.ofrecer(itemSolicitado.getNombre(), cantidadParaOfrecer); // doy todooo
+                itemSolicitado.setCantidad(itemSolicitado.getCantidad()-cantidadParaOfrecer); // no se cumplio todoo
+            }
+        }
+        else if(cofre instanceof CofreAlmacenamiento){
+            ((CofreAlmacenamiento)cofre).almacenar(itemSolicitado);
+
+        }
 
             System.out.println("🛣️ En el tramo 3 de la ruta:");
             grafo.aplicarRuta(tramo3,robot);
