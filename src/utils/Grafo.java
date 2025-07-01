@@ -158,6 +158,7 @@ public class Grafo {
             Robopuerto robopuerto = (Robopuerto) nodos.get(i);
             if(dijkstraDestino.distancias[i] < menor){
                 robopuertoMasCercano = robopuerto;
+                menor = dijkstraDestino.distancias[i];
             }
         }
         int indiceRobopuerto = nodos.indexOf(robopuertoMasCercano);

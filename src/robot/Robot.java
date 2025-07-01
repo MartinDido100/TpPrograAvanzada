@@ -11,7 +11,7 @@ public class Robot {
     private final int posicionY;
     private static double BATERIA_TOTAL = 10; //cantidad de celulas
     private double bateriaActual;
-    private static double FACTOR_CONSUMO = 1.5; //consumo de celulas
+    private static double FACTOR_CONSUMO; //consumo de celulas
     private static int capacidadCarga = 10;
     List<Item> items;
 

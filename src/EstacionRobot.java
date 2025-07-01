@@ -308,7 +308,7 @@ public class EstacionRobot {
             if (tramo1 == null) {
                 System.out.println("No se puede llegar al cofre proveedor.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
-                pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
+                if(cofre instanceof CofreSolicitador)pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
                 return true; // si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
 
@@ -329,7 +329,7 @@ public class EstacionRobot {
                 System.out.println("No se puede entregar desde proveedor al solicitador.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
                 robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
-                pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
+                if(cofre instanceof CofreSolicitador)pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
                 return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
 
             }
@@ -349,7 +349,7 @@ public class EstacionRobot {
                 System.out.println("No se puede regresar a ningún robopuerto después de entregar.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
                 robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
-                pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
+                if(cofre instanceof CofreSolicitador)pedidosNoCumplidos.put((CofreSolicitador)cofre,itemSolicitado);
                 return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
 
@@ -427,7 +427,20 @@ public class EstacionRobot {
             }
             if(CofreAlmacenador == null)continue;
 
-
+            menorDistancia = Double.MAX_VALUE;
+            Robopuerto robopuertoMasCercano = null;
+            ResultadoDijkstra DijkstraAlmacenador = grafo.dijkstraNodos[grafo.nodos.indexOf(CofreAlmacenador)];
+            for(int i=0;i<grafo.cantidadRobopuertos;i++){
+                Robopuerto robopuerto = (Robopuerto) grafo.nodos.get(i);
+                if(DijkstraAlmacenador.distancias[i] < menorDistancia && !robopuerto.getRobotsActuales().isEmpty() ){
+                    robopuertoMasCercano = robopuerto;
+                    menorDistancia = DijkstraAlmacenador.distancias[i];
+                }
+            }
+            if(robopuertoMasCercano == null){
+                System.out.println("El cofre no tiene a ningun robopuerto en cobertura, no se puede completar la entrega");
+                return;
+            }
 
             Iterator<Map.Entry<String, Integer>> it = prov.getOfrecimientos().entrySet().iterator();
 
@@ -435,20 +448,7 @@ public class EstacionRobot {
                 Map.Entry<String, Integer> entry = it.next();
                 Item itemExcedente = new Item(entry.getKey(), entry.getValue());
 
-                menorDistancia = Double.MAX_VALUE;
-                Robopuerto robopuertoMasCercano = null;
-                ResultadoDijkstra DijkstraAlmacenador = grafo.dijkstraNodos[grafo.nodos.indexOf(CofreAlmacenador)];
-                for(int i=0;i<grafo.cantidadRobopuertos;i++){
-                    Robopuerto robopuerto = (Robopuerto) grafo.nodos.get(i);
-                    if(DijkstraAlmacenador.distancias[i] < menorDistancia && !robopuerto.getRobotsActuales().isEmpty() ){
-                        robopuertoMasCercano = robopuerto;
-                        menorDistancia = DijkstraAlmacenador.distancias[i];
-                    }
-                }
-                if(robopuertoMasCercano == null){
-                    System.out.println("El cofre no tiene a ningun robopuerto en cobertura, no se puede completar la entrega");
-                    return;
-                }
+
 
                 realizarEntrega(CofreAlmacenador, itemExcedente,prov,robopuertoMasCercano);
 
