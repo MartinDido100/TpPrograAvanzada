@@ -231,9 +231,7 @@ public class Grafo {
 
                 }
 
-                else {
 
-                }
                 if(debeRecargar && !esRobopuerto(vecino)) { // necesito recargar en el medio
                     continue;
                 }
@@ -277,15 +275,15 @@ public class Grafo {
     public ResultadoDijkstra dijkstra(Object origen){
 
         class Nodo {
-            int nodo;
-            double distancia;
+            final int nodo;
+            final double distancia;
 
             Nodo(int nodo, double distanciaTotal) {
                 this.nodo = nodo;
                 this.distancia = distanciaTotal;
             }
         }
-        ResultadoDijkstra resul = null;
+        ResultadoDijkstra resul;
         int[] sucesores = new int[matrizAdyacencia.length];
         PriorityQueue<Nodo> heap = new PriorityQueue<>(Comparator.comparingDouble(n -> n.distancia));
         double[] distancia = new double[matrizAdyacencia.length];
