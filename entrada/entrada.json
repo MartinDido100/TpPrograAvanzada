@@ -42,11 +42,6 @@
         "Oro" : 8,
         "Plata": 1
       }
-    },
-    { "posicionX": 8,
-      "posicionY": 12,
-      "id": 2,
-      "tipo": "ALMACENAMIENTO"
     }
   ],
   "robots": [

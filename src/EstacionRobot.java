@@ -308,7 +308,11 @@ public class EstacionRobot {
             if (tramo1 == null) {
                 System.out.println("No se puede llegar al cofre proveedor.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
-                pedidosNoCumplidos.put((Cofre)cofre,itemSolicitado);
+                if(cofre instanceof CofreSolicitador){
+                    pedidosNoCumplidos.put((Cofre)cofre,itemSolicitado);
+                }else{
+                    pedidosNoCumplidos.put((Cofre)proveedor,itemSolicitado);
+                }
                 return true; // si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
 
@@ -329,7 +333,11 @@ public class EstacionRobot {
                 System.out.println("No se puede entregar desde proveedor al solicitador.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
                 robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
-                pedidosNoCumplidos.put((Cofre)cofre,itemSolicitado);
+                if(cofre instanceof CofreSolicitador){
+                    pedidosNoCumplidos.put((Cofre)cofre,itemSolicitado);
+                }else{
+                    pedidosNoCumplidos.put((Cofre)proveedor,itemSolicitado);
+                }
                 return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
 
             }
@@ -349,7 +357,11 @@ public class EstacionRobot {
                 System.out.println("No se puede regresar a ningún robopuerto después de entregar.");
                 robopuertoConRobotMasCercano.getRobotsActuales().addFirst(robot);
                 robot.recargar(); // ya que al final no se pudo realizar, le restauro la bateria consumida
-                pedidosNoCumplidos.put((Cofre)cofre,itemSolicitado);
+                if(cofre instanceof CofreSolicitador){
+                    pedidosNoCumplidos.put((Cofre)cofre,itemSolicitado);
+                }else{
+                    pedidosNoCumplidos.put((Cofre)proveedor,itemSolicitado);
+                }
                 return true;// si no hay ruta, no puedo cumplir el pedido, devuelvo true para que lo saque de la lista
             }
 
@@ -408,7 +420,7 @@ public class EstacionRobot {
 
         for (CofreProveedor prov : cofresProveedores) {
 
-            if(cofresAlmacenamiento.isEmpty()){
+            if(cofresAlmacenamiento.isEmpty() && !prov.getOfrecimientos().isEmpty()){
                 Iterator<Map.Entry<String, Integer>> it = prov.getOfrecimientos().entrySet().iterator();
                 while (it.hasNext()) {
 
