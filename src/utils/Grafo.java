@@ -181,7 +181,6 @@ public class Grafo {
         double bateriaInicial = robot.getBateriaActual();
         cola.add(new Estado(origen, bateriaInicial, caminoInicial, 0));
 
-        System.out.println("🔄 Planificando desde nodo: " + getNodo(origen) + " hacia: " + getNodo(destino) + " con batería inicial: " + String.format("%.2f", bateriaInicial));
         System.out.println();
 
         while (!cola.isEmpty()) {
