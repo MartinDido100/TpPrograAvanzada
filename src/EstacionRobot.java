@@ -292,7 +292,7 @@ public class EstacionRobot {
                     menor = dijkstraCofreSolicitud.distancias[i];
                 }
             }
-            System.out.println(robopuertoMasCercano);
+
             // Paso 1: del robopuerto del robot al cofre proveedor
 
             int indiceCofreProveedor = grafo.nodos.indexOf(proveedor);
